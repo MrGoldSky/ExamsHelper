@@ -61,3 +61,37 @@ class insert():
             con.close()
         except BaseException:
             print("Ошибка заполнения БД (class)")
+    
+    def insert_status(self, user_id, status):
+        con, cur = self.connect_to_db()
+        try:
+            cur.execute(f"""UPDATE base
+                        SET status = {status}
+                        WHERE user_id = {user_id}
+                    """)
+            
+            con.commit()
+            con.close()
+        except BaseException:
+            print("Ошибка заполнения БД (status)")
+
+
+class select():
+    def connect_to_db(self):
+        try:
+            con = sqlite3.connect("project//data//db.sqlite")
+            cur = con.cursor()
+            return con, cur
+        except BaseException:
+            print("Ошибка подключения к БД")
+    
+    def select_status(self, user_id):
+        con, cur = self.connect_to_db()
+        try:
+            result = cur.execute(f"""SELECT status from base
+                        WHERE user_id = {user_id}
+                    """).fetchone()[0]
+            con.close()
+            return result
+        except BaseException:
+            print("Ошибка заполнения БД (status)")
