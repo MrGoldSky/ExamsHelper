@@ -4,6 +4,8 @@ from config import BOT_TOKEN, RESULT_BASE_PATH
 from to_db import insert, select
 import os
 import sqlite3
+import datetime as dt
+import time
 
 bot = telebot.TeleBot(BOT_TOKEN)
 
@@ -53,23 +55,25 @@ def view_questions(message):
     def take_number(message):
         printy(message.chat.id, f"Вариант {message.text}")
         view_question(message, message.text)
+
     os.chdir("Project_school/B_D/")
     list_return = ""
     printy(message.chat.id, "Напишите номер варианта, которых хотите решить")
     printy(message.chat.id, "Список доступных вариантов:")
     con, cur = connect_to_db()
 
-
     for i in os.listdir():
         try:
-            grade, percent = cur.execute(f"""SELECT grade, percent from base WHERE user_id = {message.chat.id} AND question = "{i}"
+            grade, percent = cur.execute(f"""SELECT grade, max(percent) from base WHERE user_id = {message.chat.id} AND question = "{i}"
                     """).fetchone()
+            count = len(cur.execute(f"""SELECT grade, percent from base WHERE user_id = {message.chat.id} AND question = "{i}"
+                    """).fetchone())
             con.close()
         except BaseException as e:
             print(e)
             list_return += f'{i.replace(".txt", "").replace("B", "")} Работа не выполнена{chr(9200)} \n'
         else:
-            list_return += f'{i.replace(".txt", "").replace("B", "")} {chr(9989)} {percent}% оценка {grade}.\n'
+            list_return += f'{i.replace(".txt", "").replace("B", "")} {chr(9989)} {percent}% оценка {grade}. Кол-во решений: {count}\n'
     printy(message.chat.id, list_return)
     bot.register_next_step_handler(message, take_number)
 
@@ -83,11 +87,13 @@ def connect_to_db():
         print("Ошибка подключения к БД")
 
 def view_question(message, number):
-    print(os.getcwd())
     with open(f"B{number}.txt", "r") as file:
         print(file.readline().split("'")[0])
         for i in file.readlines():
             print(i.rstrip())
+
+def save_result(message):
+    pass
 
 
 @bot.message_handler(content_types=["text"])
