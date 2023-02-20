@@ -1,5 +1,5 @@
 import sqlite3
-from config import TG_BASE_PATH
+from config import TG_BASE_PATH, RESULT_BASE_PATH
 
 
 def connect_to_db():
@@ -38,18 +38,18 @@ class insert():
         except BaseException:
             print("Ошибка заполнения БД (name)")
     
-    def insert_last_name(self, user_id, last_name):
+    def insert_surname(self, user_id, surname):
         con, cur = connect_to_db()
         try:
             cur.execute(f"""UPDATE base
-                        SET last_name = '{last_name}'
+                        SET surname = '{surname}'
                         WHERE user_id = {user_id}
                     """)
             
             con.commit()
             con.close()
         except BaseException:
-            print("Ошибка заполнения БД (last_name)")
+            print("Ошибка заполнения БД (surname)")
     
     def insert_class(self, user_id, class_):
         con, cur = connect_to_db()
@@ -79,13 +79,37 @@ class insert():
 
 
 class select():
-    def select_status(self, user_id):
+    def select_name(self, user_id):
         con, cur = connect_to_db()
         try:
-            result = cur.execute(f"""SELECT status from base
+            name = cur.execute(f"""SELECT name from base
                         WHERE user_id = {user_id}
                     """).fetchone()[0]
             con.close()
-            return result
+            return name
         except BaseException:
-            print("Ошибка заполнения БД (status)")
+            print("Ошибка получения (name)")
+
+
+    def select_surname(self, user_id):
+        con, cur = connect_to_db()
+        try:
+            surname = cur.execute(f"""SELECT surname from base
+                        WHERE user_id = {user_id}
+                    """).fetchone()[0]
+            con.close()
+            return surname
+        except BaseException:
+            print("Ошибка получения (surname)")
+
+
+    def select_class(self, user_id):
+        con, cur = connect_to_db()
+        try:
+            learning_class = cur.execute(f"""SELECT class from base
+                        WHERE user_id = {user_id}
+                    """).fetchone()[0]
+            con.close()
+            return learning_class
+        except BaseException:
+            print("Ошибка получения (class)")

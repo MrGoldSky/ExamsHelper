@@ -1,10 +1,10 @@
 import telebot
 from telebot import types
-from config import BOT_TOKEN, RESULT_BASE_PATH
-from to_db import insert, select
+from config import BOT_TOKEN
+from to_telegram_db import insert, select
+from to_result_db import *
 import os
-import sqlite3
-import datetime as dt
+from datetime import datetime
 import time
 
 bot = telebot.TeleBot(BOT_TOKEN)
@@ -23,6 +23,7 @@ def start(message):
     markup.add(registration, information, bot_help)
     printy(message.chat.id, f"Привет {message.from_user.first_name}!", reply_markup=markup)
 
+
 def interface(message):
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
     #TODO: Реализовать rating
@@ -31,6 +32,7 @@ def interface(message):
     bot_help = types.KeyboardButton("Помощь")
     markup.add(rating, information, bot_help)
     printy(message.chat.id, f"Возможности:", reply_markup=markup)
+
 
 def registration_student(message):
     def one(message):
@@ -42,7 +44,7 @@ def registration_student(message):
         printy(message.chat.id, f"Введите Вашу фамилию (она будет показываться учителю)")
         bot.register_next_step_handler(message, three)
     def three(message):
-        insert.insert_last_name(message.chat.id, message.text)
+        insert.insert_surname(message.chat.id, message.text)
         printy(message.chat.id, f"Введите ваш класс в формате: 10 А")
         bot.register_next_step_handler(message, four)
     def four(message):
@@ -51,46 +53,51 @@ def registration_student(message):
         interface(message)
     one(message)
 
+
 def view_questions(message):
     def take_number(message):
         printy(message.chat.id, f"Вариант {message.text}")
         view_question(message, message.text)
-
-    os.chdir("Project_school/B_D/")
+    try:
+        os.chdir("Project_school/B_D/")
+    except BaseException as e:
+        print(e)
     list_return = ""
     printy(message.chat.id, "Напишите номер варианта, которых хотите решить")
     printy(message.chat.id, "Список доступных вариантов:")
-    con, cur = connect_to_db()
 
     for i in os.listdir():
         try:
-            grade, percent = cur.execute(f"""SELECT grade, max(percent) from base WHERE user_id = {message.chat.id} AND question = "{i}"
-                    """).fetchone()
-            count = len(cur.execute(f"""SELECT grade, percent from base WHERE user_id = {message.chat.id} AND question = "{i}"
-                    """).fetchone())
-            con.close()
+            grade = select_grade(message.chat.id, i)
+            percent = select_percent(message.chat.id, i)
+            count = select_count(message.chat.id, i)
         except BaseException as e:
             print(e)
-            list_return += f'{i.replace(".txt", "").replace("B", "")} Работа не выполнена{chr(9200)} \n'
+            list_return += f'№{i.replace(".txt", "").replace("B", "")} Работа не выполнена{chr(9200)} \n'
         else:
-            list_return += f'{i.replace(".txt", "").replace("B", "")} {chr(9989)} {percent}% оценка {grade}. Кол-во решений: {count}\n'
+            list_return += f'№{i.replace(".txt", "").replace("B", "")} {chr(9989)} {percent}% оценка {grade}. Кол-во решений: {count}\n'
     printy(message.chat.id, list_return)
     bot.register_next_step_handler(message, take_number)
 
-def connect_to_db():
-    try:
-        con = sqlite3.connect(RESULT_BASE_PATH)
-        cur = con.cursor()
-        return con, cur
-    except BaseException as e:
-        print(e)
-        print("Ошибка подключения к БД")
 
 def view_question(message, number):
-    with open(f"B{number}.txt", "r") as file:
-        print(file.readline().split("'")[0])
-        for i in file.readlines():
-            print(i.rstrip())
+    time_start = datetime.now().strftime('%d.%m.%Y %H:%M')
+    printy(message.chat.id, f'''Вы начинаете решение варианта {number} \nНачало решения: {time_start}''')
+    name = select.select_name(message.chat.id)
+    surname = select.select_surname(message.chat.id)
+    learning_class = select.select_class(message.chat.id)
+    try:
+        question = f"B{number}.txt"
+        insert_time_start(message.chat.id, time_start, question, name, surname, learning_class)
+        with open(f"B{number}.txt", "r") as file:
+            print(file.readline().split("'")[0])
+            for i in file.readlines():
+                task = i.rstrip().split(";")
+
+    except BaseException as e:
+        print(e)
+        print("Ошибка показа варианта.")
+        printy(message.chat.id, "Вариант не найден")
 
 def save_result(message):
     pass
