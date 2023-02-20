@@ -53,8 +53,7 @@ def view_questions(message):
     def take_number(message):
         printy(message.chat.id, f"Вариант {message.text}")
         view_question(message, message.text)
-    
-    os.chdir("Project_school/B_D")
+    os.chdir("Project_school/B_D/")
     list_return = ""
     printy(message.chat.id, "Напишите номер варианта, которых хотите решить")
     printy(message.chat.id, "Список доступных вариантов:")
@@ -63,13 +62,14 @@ def view_questions(message):
 
     for i in os.listdir():
         try:
-            grade = cur.execute(f"""SELECT grade from base WHERE user_id = {message.chat.id}
-                    """).fetchone()[0]
+            grade, percent = cur.execute(f"""SELECT grade, percent from base WHERE user_id = {message.chat.id} AND question = "{i}"
+                    """).fetchone()
             con.close()
-        except BaseException:
+        except BaseException as e:
+            print(e)
             list_return += f'{i.replace(".txt", "").replace("B", "")} Работа не выполнена{chr(9200)} \n'
         else:
-            list_return += f'{i.replace(".txt", "").replace("B", "")} {chr(9989)} {grade} \n'
+            list_return += f'{i.replace(".txt", "").replace("B", "")} {chr(9989)} {percent}% оценка {grade}.\n'
     printy(message.chat.id, list_return)
     bot.register_next_step_handler(message, take_number)
 
@@ -102,15 +102,14 @@ def check_text_message(message):
     elif message.text == "Помощь в регистрации":
         printy(message.chat.id, '''Помощь в регистрации: \n\
         1. Нажмите кнопку "Регистрация" \n\
-        2. Введите ваше НАСТОЯЩЕЕ имя и фамилию. \n\
-        3. Введите класс в котором вы учитесь/преподаёте.''')
-    #TODO: Доделать помощь 
+        2. Введите ваше НАСТОЯЩЕЕ имя и фамилию \n\
+        3. Введите класс в котором вы учитесь''')
     elif message.text == "Помощь":
         printy(message.chat.id, f'''Помощь: \n\
 Нажав кнопку "Просмотреть работы" Можно будет посмотреть список заданных учителем вариантов. \n
 Символом {chr(9989)} отмечены выполненные работы.
 Символом {chr(9200)} отмечены работы, ожидающие выполнения. \n
-После того, как вы сдадите работу, рядом будет написан % решения и оценка''')
+После того, как вы сдадите работу, рядом будет стоять оценка''')
     elif message.text == "Просмотреть работы":
         view_questions(message)
     elif message.text == "":
