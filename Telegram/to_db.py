@@ -1,18 +1,20 @@
 import sqlite3
+from config import TG_BASE_PATH
 
+
+def connect_to_db():
+    try:
+        con = sqlite3.connect(TG_BASE_PATH)
+        cur = con.cursor()
+        return con, cur
+    except BaseException as e:
+        print(e)
+        print("Ошибка подключения к БД")
 
 class insert():
 
-    def connect_to_db(self):
-        try:
-            con = sqlite3.connect("project//data//db.sqlite")
-            cur = con.cursor()
-            return con, cur
-        except BaseException:
-            print("Ошибка подключения к БД")
-    
     def insert_id(self, user_id):
-        con, cur = self.connect_to_db()
+        con, cur = connect_to_db()
         try:
             cur.execute(f"""INSERT INTO base(user_id)
                             VALUES ({user_id})
@@ -24,7 +26,7 @@ class insert():
             print("Ошибка заполнения БД (id)")
     
     def insert_name(self, user_id, name):
-        con, cur = self.connect_to_db()
+        con, cur = connect_to_db()
         try:
             cur.execute(f"""UPDATE base
                         SET name = '{name}'
@@ -37,7 +39,7 @@ class insert():
             print("Ошибка заполнения БД (name)")
     
     def insert_last_name(self, user_id, last_name):
-        con, cur = self.connect_to_db()
+        con, cur = connect_to_db()
         try:
             cur.execute(f"""UPDATE base
                         SET last_name = '{last_name}'
@@ -50,7 +52,7 @@ class insert():
             print("Ошибка заполнения БД (last_name)")
     
     def insert_class(self, user_id, class_):
-        con, cur = self.connect_to_db()
+        con, cur = connect_to_db()
         try:
             cur.execute(f"""UPDATE base
                         SET class = '{class_}'
@@ -63,7 +65,7 @@ class insert():
             print("Ошибка заполнения БД (class)")
     
     def insert_status(self, user_id, status):
-        con, cur = self.connect_to_db()
+        con, cur = connect_to_db()
         try:
             cur.execute(f"""UPDATE base
                         SET status = {status}
@@ -77,16 +79,8 @@ class insert():
 
 
 class select():
-    def connect_to_db(self):
-        try:
-            con = sqlite3.connect("project//data//db.sqlite")
-            cur = con.cursor()
-            return con, cur
-        except BaseException:
-            print("Ошибка подключения к БД")
-    
     def select_status(self, user_id):
-        con, cur = self.connect_to_db()
+        con, cur = connect_to_db()
         try:
             result = cur.execute(f"""SELECT status from base
                         WHERE user_id = {user_id}
