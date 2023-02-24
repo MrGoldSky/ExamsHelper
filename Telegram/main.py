@@ -1,11 +1,14 @@
 import telebot
 from telebot import types
-from config import BOT_TOKEN
+from config import BOT_TOKEN, URL, BASE, B_D
 from to_telegram_db import insert, select
 from to_result_db import *
 import os
 from datetime import datetime
 import time
+import requests
+import threading
+
 
 bot = telebot.TeleBot(BOT_TOKEN)
 
@@ -56,14 +59,15 @@ def registration_student(message):
 
 def view_questions(message):
     def take_number(message):
-        printy(message.chat.id, f"Вариант {message.text}")
+        if message.text == "Назад":
+            return interface(message)
         view_question(message, message.text)
     try:
-        os.chdir("Project_school/B_D/")
+        os.chdir(B_D)
     except BaseException as e:
-        print(e)
+        pass
     list_return = ""
-    printy(message.chat.id, "Напишите номер варианта, которых хотите решить")
+    printy(message.chat.id, 'Напишите номер варианта, который хотите решить. Или нажмите кнопку "Назад", чтобы вернуться назад')
     printy(message.chat.id, "Список доступных вариантов:")
 
     for i in os.listdir():
@@ -71,16 +75,28 @@ def view_questions(message):
             grade = select_grade(message.chat.id, i)
             percent = select_percent(message.chat.id, i)
             count = select_count(message.chat.id, i)
+            if grade is None or count is None or count == 0:
+                list_return += f'№{i.replace(".txt", "").replace("B", "")} Работа не выполнена{chr(9200)} \n'
+            else:
+                list_return += f'№{i.replace(".txt", "").replace("B", "")} {chr(9989)} {percent}% оценка {grade}. Кол-во решений: {count}\n'
         except BaseException as e:
             print(e)
-            list_return += f'№{i.replace(".txt", "").replace("B", "")} Работа не выполнена{chr(9200)} \n'
-        else:
-            list_return += f'№{i.replace(".txt", "").replace("B", "")} {chr(9989)} {percent}% оценка {grade}. Кол-во решений: {count}\n'
+            print("Вообще хз, что не так тут (view_questions)")
     printy(message.chat.id, list_return)
     bot.register_next_step_handler(message, take_number)
 
 
 def view_question(message, number):
+    def view(message, task):
+        os.chdir(BASE)
+        #? Номер вопроса, имя файла карточки, время, правильный ответ, имя папки с карточками
+        photo = {'photo': open(f"{task[4]}\{task[1]}", 'rb')}
+        text = f"Номер вопроса: {task[0]}. Вам даётся {task[2]} минуты."
+        requests.post(f'{URL}{BOT_TOKEN}/sendPhoto?chat_id={message.chat.id}&caption={text}', files=photo)
+        
+        
+        
+
     time_start = datetime.now().strftime('%d.%m.%Y %H:%M')
     printy(message.chat.id, f'''Вы начинаете решение варианта {number} \nНачало решения: {time_start}''')
     name = select.select_name(message.chat.id)
@@ -93,15 +109,22 @@ def view_question(message, number):
             print(file.readline().split("'")[0])
             for i in file.readlines():
                 task = i.rstrip().split(";")
+                view(message, task)
+
+
+
 
     except BaseException as e:
         print(e)
         print("Ошибка показа варианта.")
-        printy(message.chat.id, "Вариант не найден")
+        printy(message.chat.id, "Ошибка показа варианта.")
+    else:
+        os.chdir(B_D)
+        check_question(number, question)
 
-def save_result(message):
+
+def check_question(message, question):
     pass
-
 
 @bot.message_handler(content_types=["text"])
 def check_text_message(message):

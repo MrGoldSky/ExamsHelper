@@ -49,7 +49,7 @@ def select_count(user_id, question):
     con, cur = connect_to_db()
     try:
         count = len(cur.execute(f"""SELECT grade, percent from base WHERE user_id = {user_id} AND question = "{question}"
-                    """).fetchone())
+                    """).fetchall())
     except BaseException :
-        print("Ошибка получения результата (count)")
+        pass
     return count
