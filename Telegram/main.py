@@ -4,10 +4,9 @@ from config import BOT_TOKEN, URL, BASE, B_D
 from to_telegram_db import insert, select
 from to_result_db import *
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 import time
 import requests
-import threading
 
 
 bot = telebot.TeleBot(BOT_TOKEN)
@@ -29,7 +28,6 @@ def start(message):
 
 def interface(message):
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
-    #TODO: Реализовать rating
     rating = types.KeyboardButton("Просмотреть работы")
     information = types.KeyboardButton("Информация о боте")
     bot_help = types.KeyboardButton("Помощь")
@@ -93,10 +91,7 @@ def view_question(message, number):
         photo = {'photo': open(f"{task[4]}\{task[1]}", 'rb')}
         text = f"Номер вопроса: {task[0]}. Вам даётся {task[2]} минуты."
         requests.post(f'{URL}{BOT_TOKEN}/sendPhoto?chat_id={message.chat.id}&caption={text}', files=photo)
-        
-        
-        
-
+    
     time_start = datetime.now().strftime('%d.%m.%Y %H:%M')
     printy(message.chat.id, f'''Вы начинаете решение варианта {number} \nНачало решения: {time_start}''')
     name = select.select_name(message.chat.id)
@@ -105,14 +100,23 @@ def view_question(message, number):
     try:
         question = f"B{number}.txt"
         insert_time_start(message.chat.id, time_start, question, name, surname, learning_class)
-        with open(f"B{number}.txt", "r") as file:
+        with open(question, "r", encoding="utf8") as file:
+            time = 0
             print(file.readline().split("'")[0])
             for i in file.readlines():
+                time += int(i.rstrip().split(";")[2])
+            time_start = datetime.now().strftime('%H:%M')
+            dt_time_stop = datetime.now() + timedelta(minutes=time)
+            file.close()
+        with open(question, "r", encoding="utf8") as file:
+            file.readline()
+            for i in file.readlines():
                 task = i.rstrip().split(";")
-                view(message, task)
-
-
-
+                if datetime.now() > dt_time_stop:
+                    printy(message.chat.id, "Время кончилось")
+                    break
+                else:
+                    view(message, task)
 
     except BaseException as e:
         print(e)
@@ -125,6 +129,7 @@ def view_question(message, number):
 
 def check_question(message, question):
     pass
+
 
 @bot.message_handler(content_types=["text"])
 def check_text_message(message):
