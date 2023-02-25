@@ -59,7 +59,7 @@ def view_questions(message):
     def take_number(message):
         if message.text == "Назад":
             return interface(message)
-        view_question(message, message.text)
+        create_tasks(message, message.text)
     try:
         os.chdir(B_D)
     except BaseException as e:
@@ -90,28 +90,38 @@ def view_questions(message):
     bot.register_next_step_handler(message, take_number)
 
 
-def view_question(message, number):
+def create_tasks(message, number):
     answer = {}
     answers = {}
-    q = 1
-    
+    tasks = []
+
     def view(message, task):
         os.chdir(BASE)
         #? Номер вопроса, имя файла карточки, время, правильный ответ, имя папки с карточками
         photo = {'photo': open(f"{task[4]}\{task[1]}", 'rb')}
         text = f"Номер вопроса: {task[0]}. Вам даётся {task[2]} минуты."
         requests.post(f'{URL}{BOT_TOKEN}/sendPhoto?chat_id={message.chat.id}&caption={text}', files=photo)
-    
+
     #! Доделать сбор ответов
-    @bot.message_handler(content_types=["text"])
-    def wait_answer(message):
-        print(message.text)
-        print(answer)
-        print(answers)
+    def wait_answer(message, q):
         answers[q] = "+"
         answer[q] = message.text
-        q += 1
 
+    def view_tasks(message):
+        if datetime.now() > dt_time_stop:
+            printy(message.chat.id, "Время кончилось")
+        else:
+            for task in tasks:
+                view(message, task)
+                printy(message.chat.id, "Введите ответ в формате: Ответ (ваш ответ)")
+                print(f"Now q is {task[0]}")
+                print(answers)
+                while answers[int(task[0])] == "-":
+                    bot.register_next_step_handler(message, wait_answer, int(task[0]))
+                    time.sleep(4)
+
+        os.chdir(B_D)
+        check_question(message, question, answers)
 
     time_start = datetime.now().strftime('%d.%m.%Y %H:%M')
     printy(message.chat.id, f'''Вы начинаете решение варианта {number} \nНачало решения: {time_start}''')
@@ -130,33 +140,20 @@ def view_question(message, number):
             time_start = datetime.now().strftime('%H:%M')
             dt_time_stop = datetime.now() + timedelta(minutes=time_)
             file.close()
-            print(answer)
-            print(answers)
         with open(question, "r") as file:
             file.readline()
             for i in file.readlines():
-                task = i.rstrip().split(";")
-                if datetime.now() > dt_time_stop:
-                    printy(message.chat.id, "Время кончилось")
-                    break
-                else:
-                    view(message, task)
-                    printy(message.chat.id, "Введите ответ в формате: Ответ (ваш ответ)")
-                    bot.register_next_step_handler(message, wait_answer)
-
-
+                tasks.append(i.rstrip().split(";"))
     except BaseException as e:
         print(e)
         print("Ошибка показа варианта.")
         printy(message.chat.id, "Ошибка показа варианта.")
     else:
-        os.chdir(B_D)
-        print(answer)
-        check_question(number, question)
+        view_tasks(message)
 
 
-def check_question(message, question):
-    pass
+def check_question(message, question, answer):
+    printy(message.chat.id, f"checked {question}")
 
 
 @bot.message_handler(content_types=["text"])
