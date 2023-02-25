@@ -65,6 +65,12 @@ def view_questions(message):
     except BaseException as e:
         pass
     list_return = ""
+
+    # markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
+    # back = types.KeyboardButton("Назад")
+    # markup.add(back)
+
+    # printy(message.chat.id, 'Напишите номер варианта, который хотите решить. Или нажмите кнопку "Назад", чтобы вернуться назад', reply_markup=markup)
     printy(message.chat.id, 'Напишите номер варианта, который хотите решить. Или нажмите кнопку "Назад", чтобы вернуться назад')
     printy(message.chat.id, "Список доступных вариантов:")
 
@@ -85,6 +91,10 @@ def view_questions(message):
 
 
 def view_question(message, number):
+    answer = {}
+    answers = {}
+    q = 1
+    
     def view(message, task):
         os.chdir(BASE)
         #? Номер вопроса, имя файла карточки, время, правильный ответ, имя папки с карточками
@@ -92,6 +102,17 @@ def view_question(message, number):
         text = f"Номер вопроса: {task[0]}. Вам даётся {task[2]} минуты."
         requests.post(f'{URL}{BOT_TOKEN}/sendPhoto?chat_id={message.chat.id}&caption={text}', files=photo)
     
+    #! Доделать сбор ответов
+    @bot.message_handler(content_types=["text"])
+    def wait_answer(message):
+        print(message.text)
+        print(answer)
+        print(answers)
+        answers[q] = "+"
+        answer[q] = message.text
+        q += 1
+
+
     time_start = datetime.now().strftime('%d.%m.%Y %H:%M')
     printy(message.chat.id, f'''Вы начинаете решение варианта {number} \nНачало решения: {time_start}''')
     name = select.select_name(message.chat.id)
@@ -100,15 +121,18 @@ def view_question(message, number):
     try:
         question = f"B{number}.txt"
         insert_time_start(message.chat.id, time_start, question, name, surname, learning_class)
-        with open(question, "r", encoding="utf8") as file:
-            time = 0
+        with open(question, "r") as file:
+            time_ = 0
             print(file.readline().split("'")[0])
             for i in file.readlines():
-                time += int(i.rstrip().split(";")[2])
+                time_ += int(i.rstrip().split(";")[2])
+                answers[int(i.rstrip().split(";")[0])] = "-"
             time_start = datetime.now().strftime('%H:%M')
-            dt_time_stop = datetime.now() + timedelta(minutes=time)
+            dt_time_stop = datetime.now() + timedelta(minutes=time_)
             file.close()
-        with open(question, "r", encoding="utf8") as file:
+            print(answer)
+            print(answers)
+        with open(question, "r") as file:
             file.readline()
             for i in file.readlines():
                 task = i.rstrip().split(";")
@@ -117,6 +141,9 @@ def view_question(message, number):
                     break
                 else:
                     view(message, task)
+                    printy(message.chat.id, "Введите ответ в формате: Ответ (ваш ответ)")
+                    bot.register_next_step_handler(message, wait_answer)
+
 
     except BaseException as e:
         print(e)
@@ -124,6 +151,7 @@ def view_question(message, number):
         printy(message.chat.id, "Ошибка показа варианта.")
     else:
         os.chdir(B_D)
+        print(answer)
         check_question(number, question)
 
 
