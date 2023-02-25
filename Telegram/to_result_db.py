@@ -11,18 +11,18 @@ def connect_to_db():
         print("Ошибка подключения к БД")
 
 
-def insert_time_start(user_id, time_start, question, name, surname, learning_class):
+def insert_result(name, surname, learning_class, percent, grade, user_id, question, time_start, time_solve):
     con, cur = connect_to_db()
     try:
-        cur.execute(f"""INSERT INTO base(time_start, user_id, question, name, surname, class) 
-                        VALUES ("{time_start}", "{user_id}", "{question}", "{name}", "{surname}", "{learning_class}")
+        cur.execute(f"""INSERT INTO base(name, surname, class, percent, grade, user_id, question, time_start, time_solve) 
+                    VALUES ("{name}, {surname}, {learning_class}, {percent}, {grade}, {user_id}, {question}, {time_start}, {time_solve}")
                 """)
         
         con.commit()
         con.close()
     except BaseException as e:
         print(e)
-        print("Ошибка заполнения БД (time_start)")
+        print("Ошибка заполнения БД (result)")
 
 
 def select_grade(user_id, question):

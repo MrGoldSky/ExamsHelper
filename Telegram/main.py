@@ -1,13 +1,15 @@
+import os
+import threading
+import time
+from datetime import datetime, timedelta
+
+import requests
 import telebot
 from telebot import types
-from config import BOT_TOKEN, URL, BASE, B_D
-from to_telegram_db import insert, select
-from to_result_db import *
-import os
-from datetime import datetime, timedelta
-import time
-import requests
 
+from config import B_D, BASE, BOT_TOKEN, URL
+from to_result_db import *
+from to_telegram_db import insert, select
 
 bot = telebot.TeleBot(BOT_TOKEN)
 
@@ -108,6 +110,7 @@ def create_tasks(message, number):
 
     def view_tasks(message):
         stop = 0
+        start = datetime.now()
         for task in tasks:
             if stop == 1: break
             view(message, task)
@@ -118,7 +121,15 @@ def create_tasks(message, number):
                     stop = 1
                     break
                 bot.register_next_step_handler(message, wait_answer, int(task[0]))
-                time.sleep(3)
+                time.sleep(2)
+
+        answer["name"] = name
+        answer["surname"] = surname
+        answer["class"] = learning_class
+        answer["question"] = question
+        answer["time_solve"] = str(round((datetime.now() - start).total_seconds() / 60, 2)) + "min"
+        answer["user_id"] = message.chat.id
+        answer["time_start"] = time_start
 
         os.chdir(B_D)
         check_question(message, number, answer)
@@ -130,7 +141,6 @@ def create_tasks(message, number):
     learning_class = select.select_class(message.chat.id)
     try:
         question = f"B{number}.txt"
-        insert_time_start(message.chat.id, time_start, question, name, surname, learning_class)
         with open(question, "r") as file:
             time_ = 0
             print(file.readline().split("'")[0])
@@ -149,12 +159,13 @@ def create_tasks(message, number):
         print("Ошибка показа варианта.")
         printy(message.chat.id, "Ошибка показа варианта.")
     else:
-        view_tasks(message)
+        t = threading.Thread(target=view_tasks, args=(message,))
+        t.start()
 
 
 def check_question(message, number, answer):
     printy(message.chat.id, f"Вариант {number} отправлен на проверку")
-    print(answer)
+
 
 
 @bot.message_handler(content_types=["text"])
