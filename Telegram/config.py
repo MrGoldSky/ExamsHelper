@@ -4,3 +4,4 @@ RESULT_BASE_PATH = "C:/Users/Mr_GoldSky_/Desktop/Git/Project_school/result_base/
 BASE = "C:/Users/Mr_GoldSky_/Desktop/Git/Project_school/Base"
 B_D = "C:/Users/Mr_GoldSky_/Desktop/Git/Project_school/B_D"
 URL = 'https://api.telegram.org/bot'
+RESULT_PATH = "C:/Users/Mr_GoldSky_/Desktop/Git/Project_school/Rezult"

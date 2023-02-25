@@ -7,7 +7,7 @@ import requests
 import telebot
 from telebot import types
 
-from config import B_D, BASE, BOT_TOKEN, URL
+from config import B_D, BASE, BOT_TOKEN, URL, RESULT_PATH
 from to_result_db import *
 from to_telegram_db import insert, select
 
@@ -111,13 +111,16 @@ def create_tasks(message, number):
         stop = 0
         start = datetime.now()
         for task in tasks:
-            if stop == 1: break
+            if stop == 1:
+                answer[int(task[0])] = None
+                continue
             view(message, task)
             printy(message.chat.id, "Введите ответ (число или пара чисел, записанных через пробел)")
             while answers[int(task[0])] == "-":
                 if datetime.now() > dt_time_stop:
-                    printy(message.chat.id, f"Время кончилось. Вариант {number} отправлен на проверку")
+                    printy(message.chat.id, f"Время кончилось.")
                     stop = 1
+                    answer[int(task[0])] = None
                     break
                 bot.register_next_step_handler(message, wait_answer, int(task[0]))
                 time.sleep(2)
@@ -172,7 +175,7 @@ def check_question(message, number, answer):
         for i in file.readlines():
             if i.rstrip().split(";")[3] == answer[int(i.rstrip().split(";")[0])]:
                 count_right += 1
-        percent = count_right / count * 100
+        percent = round(count_right / count * 100, 2)
         if percent >= 85:
             grade = 5
         elif percent  >= 70:
@@ -193,6 +196,15 @@ def check_question(message, number, answer):
     time_solve = answer["time_solve"]
 
     insert_result(name, surname, learning_class, percent, grade, user_id, question, time_start, time_solve)
+
+#     go_txt(answer)
+
+
+# def go_txt(answer):
+#     os.chdir(RESULT_PATH)
+#     file_name = answer["surname"] + ".txt"
+#     with open(file_name, "w") as file:
+#         pass
 
 @bot.message_handler(content_types=["text"])
 def check_text_message(message):
