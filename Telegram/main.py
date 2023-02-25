@@ -68,12 +68,11 @@ def view_questions(message):
         pass
     list_return = ""
 
-    # markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
-    # back = types.KeyboardButton("Назад")
-    # markup.add(back)
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
+    back = types.KeyboardButton("Назад")
+    markup.add(back)
 
-    # printy(message.chat.id, 'Напишите номер варианта, который хотите решить. Или нажмите кнопку "Назад", чтобы вернуться назад', reply_markup=markup)
-    printy(message.chat.id, 'Напишите номер варианта, который хотите решить. Или нажмите кнопку "Назад", чтобы вернуться назад')
+    printy(message.chat.id, 'Напишите номер варианта, который хотите решить. Или нажмите кнопку "Назад", чтобы вернуться назад', reply_markup=markup)
     printy(message.chat.id, "Список доступных вариантов:")
 
     for i in os.listdir():
@@ -143,11 +142,11 @@ def create_tasks(message, number):
         question = f"B{number}.txt"
         with open(question, "r") as file:
             time_ = 0
-            print(file.readline().split("'")[0])
+            file.readline()
+            # print(file.readline().split("'")[0])
             for i in file.readlines():
                 time_ += int(i.rstrip().split(";")[2])
                 answers[int(i.rstrip().split(";")[0])] = "-"
-            time_start = datetime.now().strftime('%H:%M')
             dt_time_stop = datetime.now() + timedelta(minutes=time_)
             file.close()
         with open(question, "r") as file:
@@ -164,9 +163,36 @@ def create_tasks(message, number):
 
 
 def check_question(message, number, answer):
-    printy(message.chat.id, f"Вариант {number} отправлен на проверку")
+    printy(message.chat.id, f"Вариант {number} отправлен на проверку. Результаты вы можете посмотреть во вкладке: Просмотреть работы")
+    print(answer)
+    interface(message)
+    count_right = 0
+    with open(answer["question"], "r") as file:
+        count = int(file.readline()[0])
+        for i in file.readlines():
+            if i.rstrip().split(";")[3] == answer[int(i.rstrip().split(";")[0])]:
+                count_right += 1
+        percent = count_right / count * 100
+        if percent >= 85:
+            grade = 5
+        elif percent  >= 70:
+            grade = 4
+        elif percent >= 50:
+            grade = 3
+        elif percent >= 40:
+            grade = 2
+        else:
+            grade = 1
 
+    name = answer["name"]
+    surname = answer["surname"]
+    learning_class = answer["class"]
+    user_id = answer["user_id"]
+    question = answer["question"]
+    time_start = answer["time_start"]
+    time_solve = answer["time_solve"]
 
+    insert_result(name, surname, learning_class, percent, grade, user_id, question, time_start, time_solve)
 
 @bot.message_handler(content_types=["text"])
 def check_text_message(message):

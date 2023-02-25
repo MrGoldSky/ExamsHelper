@@ -15,7 +15,7 @@ def insert_result(name, surname, learning_class, percent, grade, user_id, questi
     con, cur = connect_to_db()
     try:
         cur.execute(f"""INSERT INTO base(name, surname, class, percent, grade, user_id, question, time_start, time_solve) 
-                    VALUES ("{name}, {surname}, {learning_class}, {percent}, {grade}, {user_id}, {question}, {time_start}, {time_solve}")
+                    VALUES ("{name}", "{surname}", "{learning_class}", {percent}, {grade}, {user_id}, "{question}", "{time_start}", "{time_solve}")
                 """)
         
         con.commit()
