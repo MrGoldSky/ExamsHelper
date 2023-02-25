@@ -102,26 +102,26 @@ def create_tasks(message, number):
         text = f"Номер вопроса: {task[0]}. Вам даётся {task[2]} минуты."
         requests.post(f'{URL}{BOT_TOKEN}/sendPhoto?chat_id={message.chat.id}&caption={text}', files=photo)
 
-    #! Доделать сбор ответов
     def wait_answer(message, q):
         answers[q] = "+"
         answer[q] = message.text
 
     def view_tasks(message):
-        if datetime.now() > dt_time_stop:
-            printy(message.chat.id, "Время кончилось")
-        else:
-            for task in tasks:
-                view(message, task)
-                printy(message.chat.id, "Введите ответ в формате: Ответ (ваш ответ)")
-                print(f"Now q is {task[0]}")
-                print(answers)
-                while answers[int(task[0])] == "-":
-                    bot.register_next_step_handler(message, wait_answer, int(task[0]))
-                    time.sleep(4)
+        stop = 0
+        for task in tasks:
+            if stop == 1: break
+            view(message, task)
+            printy(message.chat.id, "Введите ответ (число или пара чисел, записанных через пробел)")
+            while answers[int(task[0])] == "-":
+                if datetime.now() > dt_time_stop:
+                    printy(message.chat.id, f"Время кончилось. Вариант {number} отправлен на проверку")
+                    stop = 1
+                    break
+                bot.register_next_step_handler(message, wait_answer, int(task[0]))
+                time.sleep(3)
 
         os.chdir(B_D)
-        check_question(message, question, answers)
+        check_question(message, number, answer)
 
     time_start = datetime.now().strftime('%d.%m.%Y %H:%M')
     printy(message.chat.id, f'''Вы начинаете решение варианта {number} \nНачало решения: {time_start}''')
@@ -152,8 +152,9 @@ def create_tasks(message, number):
         view_tasks(message)
 
 
-def check_question(message, question, answer):
-    printy(message.chat.id, f"checked {question}")
+def check_question(message, number, answer):
+    printy(message.chat.id, f"Вариант {number} отправлен на проверку")
+    print(answer)
 
 
 @bot.message_handler(content_types=["text"])
