@@ -1,5 +1,5 @@
 import sqlite3
-from config import TG_BASE_PATH, RESULT_BASE_PATH
+from config import TG_BASE_PATH
 
 
 def connect_to_db():

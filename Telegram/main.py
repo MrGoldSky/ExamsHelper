@@ -17,6 +17,9 @@ printy = bot.send_message
 insert = insert()
 select = select()
 
+#TODO: Удаление картинки после ответа. 
+#TODO: Рандомные варианты
+#TODO: QT форма
 
 @bot.message_handler(commands=["start"])
 def start(message):
@@ -95,34 +98,42 @@ def create_tasks(message, number):
     answer = {}
     answers = {}
     tasks = []
+    
+    def delete_image(chat_id, delete):
+        for message_id in delete:
+            bot.delete_message(chat_id=chat_id, message_id=message_id)
 
     def view(message, task):
         os.chdir(BASE)
         #? Номер вопроса, имя файла карточки, время, правильный ответ, имя папки с карточками
         photo = {'photo': open(f"{task[4]}\{task[1]}", 'rb')}
         text = f"Номер вопроса: {task[0]}. Вам даётся {task[2]} минуты."
-        requests.post(f'{URL}{BOT_TOKEN}/sendPhoto?chat_id={message.chat.id}&caption={text}', files=photo)
+        sent = bot.send_photo(message.chat.id, photo=photo['photo'], caption=text)
+        return sent.message_id
 
-    def wait_answer(message, q):
+    def wait_answer(message, q, delete):
         answers[q] = "+"
         answer[q] = message.text
+        delete_image(message.chat.id, delete)
 
     def view_tasks(message):
+        delete = []
         stop = 0
         start = datetime.now()
         for task in tasks:
             if stop == 1:
                 answer[int(task[0])] = None
                 continue
-            view(message, task)
-            printy(message.chat.id, "Введите ответ (число или пара чисел, записанных через пробел)")
+            delete.append(view(message, task))
+            delete.append(printy(message.chat.id, "Введите ответ (число или пара чисел, записанных через пробел)").message_id)
             while answers[int(task[0])] == "-":
                 if datetime.now() > dt_time_stop:
                     printy(message.chat.id, f"Время кончилось.")
                     stop = 1
                     answer[int(task[0])] = None
                     break
-                bot.register_next_step_handler(message, wait_answer, int(task[0]))
+                bot.register_next_step_handler(message, wait_answer, int(task[0]), delete)
+                delete = []
                 time.sleep(2)
 
         answer["name"] = name
