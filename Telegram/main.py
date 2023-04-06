@@ -17,9 +17,7 @@ printy = bot.send_message
 insert = insert()
 select = select()
 
-#TODO: Удаление картинки после ответа. 
 #TODO: Рандомные варианты
-#TODO: QT форма
 
 @bot.message_handler(commands=["start"])
 def start(message):
@@ -117,6 +115,8 @@ def create_tasks(message, number):
         delete_image(message.chat.id, delete)
 
     def view_tasks(message):
+        if message.text == "Назад":
+            return interface(message)
         delete = []
         stop = 0
         start = datetime.now()
@@ -143,6 +143,7 @@ def create_tasks(message, number):
         answer["time_solve"] = str(round((datetime.now() - start).total_seconds() / 60, 2)) + "min"
         answer["user_id"] = message.chat.id
         answer["time_start"] = time_start
+        answer['answers'] = answers
 
         os.chdir(B_D)
         check_question(message, number, answer)
@@ -178,7 +179,6 @@ def create_tasks(message, number):
 
 def check_question(message, number, answer):
     printy(message.chat.id, f"Вариант {number} отправлен на проверку. Результаты вы можете посмотреть во вкладке: Просмотреть работы")
-    print(answer)
     interface(message)
     count_right = 0
     with open(answer["question"], "r") as file:
@@ -186,6 +186,9 @@ def check_question(message, number, answer):
         for i in file.readlines():
             if i.rstrip().split(";")[3] == answer[int(i.rstrip().split(";")[0])]:
                 count_right += 1
+                answer['answers'][int(i[0])] = '+'
+            else:
+                answer['answers'][int(i[0])] = '-'
         percent = round(count_right / count * 100, 2)
         if percent >= 85:
             grade = 5
@@ -197,6 +200,12 @@ def check_question(message, number, answer):
             grade = 2
         else:
             grade = 1
+    print(answer)
+    s = ''
+    for i in range(len(answer['answers'])):
+        s += f'Номер {i + 1} {answer["answers"][i + 1]} \n'
+    printy(message.chat.id, f'''Вариант {number} Оценка {grade}
+{s}''')
 
     name = answer["name"]
     surname = answer["surname"]
@@ -220,7 +229,7 @@ def check_question(message, number, answer):
 @bot.message_handler(content_types=["text"])
 def check_text_message(message):
     if message.text == "Информация о боте":
-        printy(message.chat.id, f"Бот создать специально для 44 Гимназии г.Пензы, для проверки знаний школьников")
+        printy(message.chat.id, f"Бот создан специально для 44 Гимназии г.Пензы, для проверки знаний школьников")
         printy(message.chat.id, "Создатель бота: https://t.me/Mr_GoldSky")
     elif message.text == "Регистрация":
         registration_student(message)
@@ -239,8 +248,8 @@ def check_text_message(message):
 После того, как вы сдадите работу, рядом будет стоять оценка''')
     elif message.text == "Просмотреть работы":
         view_questions(message)
-    elif message.text == "":
-        pass
+    elif message.text == "Назад":
+        return interface(message)
     elif message.text == "":
         pass
     elif message.text == "":

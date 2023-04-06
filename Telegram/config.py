@@ -5,3 +5,4 @@ BASE = "C:/Users/Mr_GoldSky_/Desktop/Git/Project_school/Base" #Путь к ка�
 B_D = "C:/Users/Mr_GoldSky_/Desktop/Git/Project_school/B_D" #Путь к txt вариантам
 URL = 'https://api.telegram.org/bot' #Telegram url
 RESULT_PATH = "C:/Users/Mr_GoldSky_/Desktop/Git/Project_school/Rezult" #Путь к txt результатам
+UI_PATH = 'C:/Users/Mr_GoldSky_/Desktop/Git/Project_school/Telegram/untitled.ui'
