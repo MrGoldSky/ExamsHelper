@@ -1,4 +1,4 @@
-from config import RESULT_BASE_PATH
+from botConfig import RESULT_BASE_PATH
 import sqlite3
 
 def connect_to_db():
@@ -11,11 +11,11 @@ def connect_to_db():
         print("Ошибка подключения к БД")
 
 
-def insert_result(name, surname, learning_class, percent, grade, user_id, question, time_start, time_solve):
+def insert_result(name, surname, learning_class, percent, grade, user_id, question, time_start, time_solve, answers):
     con, cur = connect_to_db()
     try:
-        cur.execute(f"""INSERT INTO base(name, surname, class, percent, grade, user_id, question, time_start, time_solve) 
-                    VALUES ("{name}", "{surname}", "{learning_class}", {percent}, {grade}, {user_id}, "{question}", "{time_start}", "{time_solve}")
+        cur.execute(f"""INSERT INTO base(name, surname, class, percent, grade, user_id, question, time_start, time_solve, answers) 
+                    VALUES ("{name}", "{surname}", "{learning_class}", {percent}, {grade}, {user_id}, "{question}", "{time_start}", "{time_solve}", "{answers}")
                 """)
         
         con.commit()

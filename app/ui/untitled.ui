@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1174</width>
+    <height>642</height>
+   </rect>
+  </property>
+  <property name="baseSize">
+   <size>
+    <width>0</width>
+    <height>0</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>Журнал</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QTableWidget" name="tableWidget">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>10</y>
+      <width>1151</width>
+      <height>511</height>
+     </rect>
+    </property>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+      <horstretch>11</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
+    </property>
+    <property name="columnCount">
+     <number>11</number>
+    </property>
+    <column>
+     <property name="text">
+      <string>id решения</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>Имя</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>Фамилия</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>Класс</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>Решение (%)</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>Оценка</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>id Telegram</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>Вариант</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>Начало решения</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>Время начала</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>Ответы</string>
+     </property>
+    </column>
+   </widget>
+   <widget class="QPushButton" name="upload">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>530</y>
+      <width>1151</width>
+      <height>71</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Обновить</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1174</width>
+     <height>21</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

@@ -7,8 +7,8 @@ import requests
 import telebot
 from telebot import types
 
-from config import B_D, BASE, BOT_TOKEN, URL, RESULT_PATH
-from to_result_db import *
+from botConfig import EXAMS, TASKS, BOT_TOKEN, URL, RESULT_PATH
+from to_result_db import select_grade, select_percent, select_count, insert_result
 from to_telegram_db import insert, select
 
 bot = telebot.TeleBot(BOT_TOKEN)
@@ -63,10 +63,7 @@ def view_questions(message):
         if message.text == "Назад":
             return interface(message)
         create_tasks(message, message.text)
-    try:
-        os.chdir(B_D)
-    except BaseException as e:
-        pass
+
     list_return = ""
 
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
@@ -76,7 +73,7 @@ def view_questions(message):
     printy(message.chat.id, 'Напишите номер варианта, который хотите решить. Или нажмите кнопку "Назад", чтобы вернуться назад', reply_markup=markup)
     printy(message.chat.id, "Список доступных вариантов:")
 
-    for i in os.listdir():
+    for i in os.listdir(EXAMS):
         try:
             grade = select_grade(message.chat.id, i)
             percent = select_percent(message.chat.id, i)
@@ -102,9 +99,9 @@ def create_tasks(message, number):
             bot.delete_message(chat_id=chat_id, message_id=message_id)
 
     def view(message, task):
-        os.chdir(BASE)
+        
         #? Номер вопроса, имя файла карточки, время, правильный ответ, имя папки с карточками
-        photo = {'photo': open(f"{task[4]}\{task[1]}", 'rb')}
+        photo = {'photo': open(f"{TASKS}{task[4]}\{task[1]}", 'rb')}
         text = f"Номер вопроса: {task[0]}. Вам даётся {task[2]} минуты."
         sent = bot.send_photo(message.chat.id, photo=photo['photo'], caption=text)
         return sent.message_id
@@ -145,7 +142,6 @@ def create_tasks(message, number):
         answer["time_start"] = time_start
         answer['answers'] = answers
 
-        os.chdir(B_D)
         check_question(message, number, answer)
 
     time_start = datetime.now().strftime('%d.%m.%Y %H:%M')
@@ -154,7 +150,7 @@ def create_tasks(message, number):
     surname = select.select_surname(message.chat.id)
     learning_class = select.select_class(message.chat.id)
     try:
-        question = f"B{number}.txt"
+        question = f"exams/B{number}.txt"
         with open(question, "r") as file:
             time_ = 0
             file.readline()
@@ -186,9 +182,9 @@ def check_question(message, number, answer):
         for i in file.readlines():
             if i.rstrip().split(";")[3] == answer[int(i.rstrip().split(";")[0])]:
                 count_right += 1
-                answer['answers'][int(i[0])] = '+'
+                answer['answers'][int(i[0])] = chr(9989)
             else:
-                answer['answers'][int(i[0])] = '-'
+                answer['answers'][int(i[0])] = chr(10060)
         percent = round(count_right / count * 100, 2)
         if percent >= 85:
             grade = 5
@@ -211,11 +207,12 @@ def check_question(message, number, answer):
     surname = answer["surname"]
     learning_class = answer["class"]
     user_id = answer["user_id"]
-    question = answer["question"]
+    question = answer["question"][6:]
     time_start = answer["time_start"]
     time_solve = answer["time_solve"]
+    answers = str(answer["answers"]).replace(f'{chr(9989)}', '+').replace(f'{chr(10060)}', '-')
 
-    insert_result(name, surname, learning_class, percent, grade, user_id, question, time_start, time_solve)
+    insert_result(name, surname, learning_class, percent, grade, user_id, question, time_start, time_solve, answers)
 
 #     go_txt(answer)
 

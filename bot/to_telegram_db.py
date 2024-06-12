@@ -1,5 +1,5 @@
 import sqlite3
-from config import TG_BASE_PATH
+from botConfig import TG_BASE_PATH
 
 
 def connect_to_db():
@@ -87,7 +87,7 @@ class select():
                     """).fetchone()[0]
             con.close()
             return name
-        except BaseException:
+        except BaseException as e:
             print("Ошибка получения (name)")
 
 
