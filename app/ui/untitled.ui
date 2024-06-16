@@ -2,110 +2,368 @@
 <ui version="4.0">
  <class>MainWindow</class>
  <widget class="QMainWindow" name="MainWindow">
+  <property name="enabled">
+   <bool>true</bool>
+  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1174</width>
-    <height>642</height>
+    <width>1200</width>
+    <height>700</height>
    </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>1200</width>
+    <height>700</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>1200</width>
+    <height>700</height>
+   </size>
   </property>
   <property name="baseSize">
    <size>
-    <width>0</width>
-    <height>0</height>
+    <width>1200</width>
+    <height>700</height>
    </size>
   </property>
   <property name="windowTitle">
    <string>Журнал</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QTableWidget" name="tableWidget">
+   <widget class="QWidget" name="verticalLayoutWidget">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>10</y>
-      <width>1151</width>
-      <height>511</height>
+      <x>0</x>
+      <y>0</y>
+      <width>1201</width>
+      <height>491</height>
      </rect>
     </property>
-    <property name="sizePolicy">
-     <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-      <horstretch>11</horstretch>
-      <verstretch>0</verstretch>
-     </sizepolicy>
-    </property>
-    <property name="columnCount">
-     <number>11</number>
-    </property>
-    <column>
-     <property name="text">
-      <string>id решения</string>
+    <layout class="QVBoxLayout" name="tableLayout">
+     <property name="leftMargin">
+      <number>10</number>
      </property>
-    </column>
-    <column>
-     <property name="text">
-      <string>Имя</string>
+     <property name="topMargin">
+      <number>10</number>
      </property>
-    </column>
-    <column>
-     <property name="text">
-      <string>Фамилия</string>
+     <property name="rightMargin">
+      <number>10</number>
      </property>
-    </column>
-    <column>
-     <property name="text">
-      <string>Класс</string>
+     <property name="bottomMargin">
+      <number>10</number>
      </property>
-    </column>
-    <column>
-     <property name="text">
-      <string>Решение (%)</string>
-     </property>
-    </column>
-    <column>
-     <property name="text">
-      <string>Оценка</string>
-     </property>
-    </column>
-    <column>
-     <property name="text">
-      <string>id Telegram</string>
-     </property>
-    </column>
-    <column>
-     <property name="text">
-      <string>Вариант</string>
-     </property>
-    </column>
-    <column>
-     <property name="text">
-      <string>Начало решения</string>
-     </property>
-    </column>
-    <column>
-     <property name="text">
-      <string>Время начала</string>
-     </property>
-    </column>
-    <column>
-     <property name="text">
-      <string>Ответы</string>
-     </property>
-    </column>
+     <item>
+      <widget class="QTableWidget" name="tableWidget">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+         <horstretch>11</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="columnCount">
+        <number>11</number>
+       </property>
+       <column>
+        <property name="text">
+         <string>id решения</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>Имя</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>Фамилия</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>Класс</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>Решение (%)</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>Оценка</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>id Telegram</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>Вариант</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>Начало решения</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>Время начала</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>Ответы</string>
+        </property>
+       </column>
+      </widget>
+     </item>
+    </layout>
    </widget>
-   <widget class="QPushButton" name="upload">
+   <widget class="QWidget" name="gridLayoutWidget">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>530</y>
-      <width>1151</width>
-      <height>71</height>
+      <x>0</x>
+      <y>500</y>
+      <width>593</width>
+      <height>146</height>
      </rect>
     </property>
-    <property name="text">
-     <string>Обновить</string>
-    </property>
+    <layout class="QGridLayout" name="settingsLayout">
+     <property name="leftMargin">
+      <number>10</number>
+     </property>
+     <property name="topMargin">
+      <number>0</number>
+     </property>
+     <property name="rightMargin">
+      <number>10</number>
+     </property>
+     <property name="bottomMargin">
+      <number>10</number>
+     </property>
+     <item row="0" column="0">
+      <widget class="QLabel" name="tableControl">
+       <property name="font">
+        <font>
+         <pointsize>12</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>Управление таблицей</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QLabel" name="examsControl">
+       <property name="font">
+        <font>
+         <pointsize>12</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>Управление вариантами</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="2">
+      <widget class="QPushButton" name="restart">
+       <property name="minimumSize">
+        <size>
+         <width>100</width>
+         <height>50</height>
+        </size>
+       </property>
+       <property name="font">
+        <font>
+         <family>MS Shell Dlg 2</family>
+         <pointsize>12</pointsize>
+         <kerning>true</kerning>
+        </font>
+       </property>
+       <property name="toolTip">
+        <string/>
+       </property>
+       <property name="text">
+        <string>Рестарт бота</string>
+       </property>
+       <property name="default">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="2">
+      <widget class="QPushButton" name="stop">
+       <property name="minimumSize">
+        <size>
+         <width>100</width>
+         <height>50</height>
+        </size>
+       </property>
+       <property name="font">
+        <font>
+         <family>MS Shell Dlg 2</family>
+         <pointsize>12</pointsize>
+         <kerning>true</kerning>
+        </font>
+       </property>
+       <property name="toolTip">
+        <string/>
+       </property>
+       <property name="text">
+        <string>Остановить бота</string>
+       </property>
+       <property name="default">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="2">
+      <widget class="QLabel" name="botControl">
+       <property name="font">
+        <font>
+         <pointsize>12</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>Управление ботом</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QPushButton" name="top">
+       <property name="minimumSize">
+        <size>
+         <width>100</width>
+         <height>50</height>
+        </size>
+       </property>
+       <property name="font">
+        <font>
+         <family>MS Shell Dlg 2</family>
+         <pointsize>12</pointsize>
+         <kerning>true</kerning>
+        </font>
+       </property>
+       <property name="toolTip">
+        <string/>
+       </property>
+       <property name="text">
+        <string>Показать лучших</string>
+       </property>
+       <property name="default">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QPushButton" name="createExams">
+       <property name="minimumSize">
+        <size>
+         <width>100</width>
+         <height>50</height>
+        </size>
+       </property>
+       <property name="font">
+        <font>
+         <family>MS Shell Dlg 2</family>
+         <pointsize>12</pointsize>
+         <kerning>true</kerning>
+        </font>
+       </property>
+       <property name="toolTip">
+        <string/>
+       </property>
+       <property name="text">
+        <string>Создать вариант</string>
+       </property>
+       <property name="default">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QPushButton" name="upload">
+       <property name="minimumSize">
+        <size>
+         <width>100</width>
+         <height>50</height>
+        </size>
+       </property>
+       <property name="font">
+        <font>
+         <family>MS Shell Dlg 2</family>
+         <pointsize>12</pointsize>
+         <kerning>true</kerning>
+        </font>
+       </property>
+       <property name="toolTip">
+        <string/>
+       </property>
+       <property name="text">
+        <string>Обновить результаты</string>
+       </property>
+       <property name="autoRepeat">
+        <bool>true</bool>
+       </property>
+       <property name="autoRepeatDelay">
+        <number>60000</number>
+       </property>
+       <property name="autoRepeatInterval">
+        <number>0</number>
+       </property>
+       <property name="default">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QPushButton" name="viewExams">
+       <property name="minimumSize">
+        <size>
+         <width>100</width>
+         <height>50</height>
+        </size>
+       </property>
+       <property name="font">
+        <font>
+         <family>MS Shell Dlg 2</family>
+         <pointsize>12</pointsize>
+         <kerning>true</kerning>
+        </font>
+       </property>
+       <property name="toolTip">
+        <string/>
+       </property>
+       <property name="text">
+        <string>Посмотреть доступные
+ варианты</string>
+       </property>
+       <property name="autoRepeat">
+        <bool>false</bool>
+       </property>
+       <property name="default">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
@@ -113,7 +371,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1174</width>
+     <width>1200</width>
      <height>21</height>
     </rect>
    </property>

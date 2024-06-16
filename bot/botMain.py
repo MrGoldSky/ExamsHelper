@@ -7,9 +7,9 @@ import requests
 import telebot
 from telebot import types
 
-from botConfig import EXAMS, TASKS, BOT_TOKEN, URL, RESULT_PATH
-from to_result_db import select_grade, select_percent, select_count, insert_result
-from to_telegram_db import insert, select
+from bot.botConfig import EXAMS, TASKS, BOT_TOKEN, URL, RESULT_PATH
+from bot.to_result_db import select_grade, select_percent, select_count, insert_result
+from bot.to_telegram_db import insert, select
 
 bot = telebot.TeleBot(BOT_TOKEN)
 
@@ -17,7 +17,11 @@ printy = bot.send_message
 insert = insert()
 select = select()
 
-#TODO: Рандомные варианты
+#TODO: Генератор вариантов
+#TODO: Сделать управление ботом через журнал
+#TODO: Добавить action окно в журнал с иформацией о программе
+#TODO: Сделать сортировку по классу/оценкам/дате
+
 
 @bot.message_handler(commands=["start"])
 def start(message):
@@ -252,4 +256,9 @@ def check_text_message(message):
     elif message.text == "":
         pass
 
-bot.polling(none_stop=True)
+
+def startBot():
+    bot.polling(none_stop=True)
+
+def stopBot():
+    bot.stop_polling()

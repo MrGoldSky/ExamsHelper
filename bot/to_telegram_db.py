@@ -1,5 +1,5 @@
 import sqlite3
-from botConfig import TG_BASE_PATH
+from bot.botConfig import TG_BASE_PATH
 
 
 def connect_to_db():

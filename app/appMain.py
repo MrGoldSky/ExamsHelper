@@ -1,12 +1,12 @@
 import sqlite3
-from appConfig import RESULT_BASE_PATH
-from appConfig import UI_PATH
-
+from app.appConfig import RESULT_BASE_PATH, UI_PATH
+from bot.botMain import stopBot, startBot
 import sys
+import threading
 
 from PyQt5 import uic
 from PyQt5.QtWidgets import QDockWidget, QApplication, QMainWindow, QPushButton, QLabel, QTimeEdit, QListWidget
-from PyQt5.QtWidgets import QCalendarWidget, QFileDialog, QTableWidgetItem
+from PyQt5.QtWidgets import QCalendarWidget, QFileDialog, QTableWidgetItem, QMessageBox
 
 
 class DBSample(QMainWindow):
@@ -15,11 +15,16 @@ class DBSample(QMainWindow):
         uic.loadUi(UI_PATH, self)
         self.con = sqlite3.connect(RESULT_BASE_PATH)
         self.cur = self.con.cursor()
-        self.upload.clicked.connect(self.select_data)
+        self.bot_thread = None
+        
+        self.upload.clicked.connect(self.selectData)
+        self.restart.clicked.connect(self.botRestart)
+        self.stop.clicked.connect(self.botStop)
+        
         self.names = ['id', 'Имя', 'Фамилия', 'Класс', 'Процент решения', 'Оценка', 'TG id', 'Вариант', 'Начало решения', 'Время решения', 'Ответы']
-        self.select_data()
+        self.selectData()
 
-    def select_data(self):
+    def selectData(self):
         self.res = self.cur.execute(f"""SELECT * from base""").fetchall()
         self.res.sort(key=lambda x: x[0], reverse=True)
         self.view()
@@ -34,10 +39,34 @@ class DBSample(QMainWindow):
                 self.tableWidget.setItem(
                     i, j, QTableWidgetItem(str(elem)))
 
-    def closeEvent(self, event):
-        self.connection.close()
+    def botStop(self):
+        stopBot()
 
-if __name__ == '__main__':
+    def botRestart(self):
+        stopBot()
+        if self.bot_thread is not None: self.bot_thread.join() # Ожидаем завершения потока
+        self.bot_thread = threading.Thread(target=startBot)
+        self.bot_thread.start()
+
+    def closeEvent(self, event):
+        if self.bot_thread is not None:
+            msg = QMessageBox()
+            msg.setWindowTitle("Внимание!")
+            buttonAceptar = msg.addButton('Да', QMessageBox.YesRole)
+            buttonCancelar = msg.addButton('Нет', QMessageBox.RejectRole)
+            msg.setDefaultButton(buttonAceptar)
+            msg.setText("Сейчас запущен бот, вы хотите его остановить перед закрытием?")
+            msg.setIcon(QMessageBox.Warning)
+            msg.exec_()
+            
+            if msg.clickedButton() == buttonAceptar:
+                stopBot()
+                self.bot_thread.join()  # Ожидаем завершения потока
+                self.con.close()
+            elif msg.clickedButton() == buttonCancelar:
+                event.accept()
+
+def openApp():
     appConfig = QApplication(sys.argv)
     ex = DBSample()
     ex.show()

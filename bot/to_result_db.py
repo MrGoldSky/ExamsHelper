@@ -1,4 +1,4 @@
-from botConfig import RESULT_BASE_PATH
+from bot.botConfig import RESULT_BASE_PATH
 import sqlite3
 
 def connect_to_db():
