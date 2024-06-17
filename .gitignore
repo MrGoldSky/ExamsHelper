@@ -1,3 +1,8 @@
 .space
 .idea
 .venv
+app/__pycache__/
+bot/__pycache__/
+app/__pycache__/appConfig.cpython-310.pyc
+app/__pycache__/appMain.cpython-310.pyc
+bot/__pycache__/botMain.cpython-310.pyc

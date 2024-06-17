@@ -6,3 +6,4 @@ EXAMS = "exams/" #Путь к txt вариантам
 URL = 'https://api.telegram.org/bot' #Telegram url
 RESULT_PATH = "results/text/" #Путь к txt результатам
 UI_PATH = 'app/ui/untitled.ui'
+STYLE_PATH = "app/ui/styles/style.css"

@@ -1,27 +1,31 @@
 import sqlite3
-from app.appConfig import RESULT_BASE_PATH, UI_PATH
+from app.appConfig import RESULT_BASE_PATH, UI_PATH, STYLE_PATH
 from bot.botMain import stopBot, startBot
 import sys
 import threading
 
 from PyQt5 import uic
-from PyQt5.QtWidgets import QDockWidget, QApplication, QMainWindow, QPushButton, QLabel, QTimeEdit, QListWidget
-from PyQt5.QtWidgets import QCalendarWidget, QFileDialog, QTableWidgetItem, QMessageBox
+from PyQt5.QtWidgets import QApplication, QMainWindow, QTableWidgetItem, QMessageBox
 
 
 class DBSample(QMainWindow):
     def __init__(self):
         super().__init__()
         uic.loadUi(UI_PATH, self)
+        self.setFixedSize(910, 700)
+        self.setStyleSheet(open(STYLE_PATH, "r").read())
+        
         self.con = sqlite3.connect(RESULT_BASE_PATH)
         self.cur = self.con.cursor()
+        
         self.bot_thread = None
+        self.firstView = True
         
         self.upload.clicked.connect(self.selectData)
         self.restart.clicked.connect(self.botRestart)
         self.stop.clicked.connect(self.botStop)
+        self.tableWidget.resizeColumnsToContents()
         
-        self.names = ['id', 'Имя', 'Фамилия', 'Класс', 'Процент решения', 'Оценка', 'TG id', 'Вариант', 'Начало решения', 'Время решения', 'Ответы']
         self.selectData()
 
     def selectData(self):
@@ -29,18 +33,17 @@ class DBSample(QMainWindow):
         self.res.sort(key=lambda x: x[0], reverse=True)
         self.view()
 
-    def view(self):
-        # self.tableWidget.setColumnCount(11)
-        # self.tableWidget.setRowCount(0)
+    def view(self):     
         for i, row in enumerate(self.res):
-            self.tableWidget.setRowCount(
-                self.tableWidget.rowCount() + 1)
+            if i > self.tableWidget.rowCount() or self.firstView is True:
+                self.tableWidget.setRowCount(self.tableWidget.rowCount() + 1)
             for j, elem in enumerate(row):
-                self.tableWidget.setItem(
-                    i, j, QTableWidgetItem(str(elem)))
+                self.tableWidget.setItem(i, j, QTableWidgetItem(str(elem)))
+        self.firstView = False
 
     def botStop(self):
         stopBot()
+        self.bot_thread = None
 
     def botRestart(self):
         stopBot()
