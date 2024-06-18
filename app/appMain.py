@@ -7,7 +7,7 @@ import threading
 from PyQt5 import uic
 from PyQt5.QtWidgets import QApplication, QMainWindow, QTableWidgetItem, QMessageBox
 from PyQt5.QtWidgets import QAbstractItemView
-from PyQt5.QtCore import QModelIndex
+from PyQt5.QtCore import QModelIndex, Qt
 
 
 class DBSample(QMainWindow):
@@ -24,12 +24,15 @@ class DBSample(QMainWindow):
         
         # Начальные значения
         self.bot_thread = None
-        self.firstView = True
+        self.hn = False
         
         # Подключение кнопок
         self.upload.clicked.connect(self.selectData)
         self.restart.clicked.connect(self.botRestart)
         self.stop.clicked.connect(self.botStop)
+        
+        # Подключение чек боксов
+        self.hideNoneCB.stateChanged.connect(self.hideNone)
         
         # Настройки виджета таблицы
         self.tableWidget.resizeColumnsToContents()
@@ -45,14 +48,20 @@ class DBSample(QMainWindow):
         self.view()
 
     def view(self): # Ввод данных в таблицу и настройка подсказок
-        for i, row in enumerate(self.res):
-            if i > self.tableWidget.rowCount() or self.firstView is True:
-                self.tableWidget.setRowCount(self.tableWidget.rowCount() + 1)
+        self.tableWidget.setRowCount(0)  # Очистка таблицы
+        
+        data = self.res
+        
+        # Если выбран режим без None
+        if self.hn:
+            data = [i for i in self.res if None not in i]
+        
+        for i, row in enumerate(data):
+            self.tableWidget.insertRow(i)
             for j, elem in enumerate(row):
                 item = QTableWidgetItem(str(elem))
                 item.setToolTip(str(elem))
                 self.tableWidget.setItem(i, j, item)
-        self.firstView = False
 
     def botStop(self): # Остановка бота
         stopBot()
@@ -61,12 +70,17 @@ class DBSample(QMainWindow):
     def botRestart(self): # Перезапуск бота
         stopBot()
         # Бот запускается в отдельном потоке
-        if self.bot_thread is not None: self.bot_thread.join() # Ожидаем завершения потока
+        if self.bot_thread is not None:
+            self.bot_thread.join()  # Ожидаем завершения потока
         self.bot_thread = threading.Thread(target=startBot)
         self.bot_thread.start()
 
+    def hideNone(self, state):
+        self.hn = (state == Qt.Checked)
+        self.view()
+
     def closeEvent(self, event): # Обработка закрытия журнала
-        # Вывод диологового окна, если бот запущен во время закрытия
+        # Вывод диалогового окна, если бот запущен во время закрытия
         if self.bot_thread is not None:
             msg = QMessageBox()
             msg.setWindowTitle("Внимание!")
@@ -89,4 +103,3 @@ def openApp(): # Открытие журнала
     ex = DBSample()
     ex.show()
     sys.exit(appConfig.exec_())
-    
