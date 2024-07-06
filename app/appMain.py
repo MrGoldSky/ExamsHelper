@@ -1,12 +1,32 @@
 import sqlite3
-from app.appConfig import RESULT_BASE_PATH, UI_PATH, STYLE_PATH
+
+from app.appConfig import RESULT_BASE_PATH, UI_PATH, STYLE_PATH, EXAMS
 from bot.botMain import stopBot, startBot
+
 import sys
+import os
 import threading
 
 from PyQt5 import uic
-from PyQt5.QtWidgets import QApplication, QMainWindow, QTableWidgetItem, QMessageBox
+from PyQt5.QtWidgets import QApplication, QMainWindow, QTableWidgetItem, QMessageBox, QWidget, QPushButton, QVBoxLayout
 
+
+class ExamWindow(QWidget):
+    def __init__(self):
+        super().__init__()
+        uic.loadUi('project/app/ui/creator.ui', self)
+        self.setFixedSize(800, 500)
+        self.tableWidget.resizeColumnsToContents()
+        self.setStyleSheet(open(STYLE_PATH, "r").read())
+        self.update.clicked.connect(self.updateTable)
+        
+    def updateTable(self):
+        files = os.listdir(EXAMS)
+
+        self.tableWidget.setRowCount(0)
+        for i, file_name in enumerate(files):
+            self.tableWidget.setRowCount(self.tableWidget.rowCount() + 1)
+            self.tableWidget.setItem(i, 0, QTableWidgetItem(file_name))
 
 class DBSample(QMainWindow):
     def __init__(self):
@@ -24,6 +44,7 @@ class DBSample(QMainWindow):
         self.upload.clicked.connect(self.selectData)
         self.restart.clicked.connect(self.botRestart)
         self.stop.clicked.connect(self.botStop)
+        self.createExams.clicked.connect(self.openExamWindow)
         self.tableWidget.resizeColumnsToContents()
         
         self.selectData()
@@ -69,9 +90,13 @@ class DBSample(QMainWindow):
             elif msg.clickedButton() == buttonCancelar:
                 event.accept()
 
+    def openExamWindow(self):
+        self.exam_window = ExamWindow()
+        self.exam_window.show()
+
+
 def openApp():
     appConfig = QApplication(sys.argv)
     ex = DBSample()
     ex.show()
     sys.exit(appConfig.exec_())
-    
