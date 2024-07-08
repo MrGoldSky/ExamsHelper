@@ -12,6 +12,7 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QTableWidgetItem, QMessag
 from PyQt5.QtWidgets import QAbstractItemView, QPushButton, QVBoxLayout
 from PyQt5.QtCore import QModelIndex, Qt
 
+
 class ExamWindow(QWidget):
     def __init__(self):
         super().__init__()
@@ -20,7 +21,8 @@ class ExamWindow(QWidget):
         self.tableWidget.resizeColumnsToContents()
         self.setStyleSheet(open(STYLE_PATH, "r").read())
         self.update.clicked.connect(self.updateTable)
-        
+        self.updateTable()
+
     def updateTable(self):
         files = os.listdir(EXAMS)
 
