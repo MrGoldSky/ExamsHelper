@@ -8,8 +8,9 @@ import os
 import threading
 
 from PyQt5 import uic
-from PyQt5.QtWidgets import QApplication, QMainWindow, QTableWidgetItem, QMessageBox, QWidget, QPushButton, QVBoxLayout
-
+from PyQt5.QtWidgets import QApplication, QMainWindow, QTableWidgetItem, QMessageBox, QWidget
+from PyQt5.QtWidgets import QAbstractItemView, QPushButton, QVBoxLayout
+from PyQt5.QtCore import QModelIndex, Qt
 
 class ExamWindow(QWidget):
     def __init__(self):
@@ -27,9 +28,6 @@ class ExamWindow(QWidget):
         for i, file_name in enumerate(files):
             self.tableWidget.setRowCount(self.tableWidget.rowCount() + 1)
             self.tableWidget.setItem(i, 0, QTableWidgetItem(file_name))
-from PyQt5.QtWidgets import QApplication, QMainWindow, QTableWidgetItem, QMessageBox
-from PyQt5.QtWidgets import QAbstractItemView
-from PyQt5.QtCore import QModelIndex, Qt
 
 
 class DBSample(QMainWindow):
