@@ -165,6 +165,41 @@
      <property name="spacing">
       <number>10</number>
      </property>
+     <item row="1" column="1">
+      <widget class="QPushButton" name="update">
+       <property name="minimumSize">
+        <size>
+         <width>175</width>
+         <height>50</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>175</width>
+         <height>50</height>
+        </size>
+       </property>
+       <property name="font">
+        <font>
+         <family>MS Shell Dlg 2</family>
+         <pointsize>10</pointsize>
+         <kerning>true</kerning>
+        </font>
+       </property>
+       <property name="toolTip">
+        <string/>
+       </property>
+       <property name="styleSheet">
+        <string notr="true"/>
+       </property>
+       <property name="text">
+        <string>Обновить список</string>
+       </property>
+       <property name="default">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
      <item row="0" column="1">
       <widget class="QPushButton" name="changeSelected">
        <property name="minimumSize">
@@ -193,7 +228,7 @@
         <string notr="true"/>
        </property>
        <property name="text">
-        <string>Изменить выбранный
+        <string>Удалить выбранный
 вариант</string>
        </property>
        <property name="default">
@@ -226,31 +261,6 @@
        </property>
       </widget>
      </item>
-     <item row="0" column="2">
-      <widget class="QCheckBox" name="checkBox">
-       <property name="minimumSize">
-        <size>
-         <width>0</width>
-         <height>50</height>
-        </size>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>150</width>
-         <height>50</height>
-        </size>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>10</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>Привязка к
-времени</string>
-       </property>
-      </widget>
-     </item>
      <item row="0" column="0">
       <widget class="QPushButton" name="create">
        <property name="minimumSize">
@@ -280,41 +290,6 @@
        </property>
        <property name="text">
         <string>Создать вариант</string>
-       </property>
-       <property name="default">
-        <bool>false</bool>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="1">
-      <widget class="QPushButton" name="update">
-       <property name="minimumSize">
-        <size>
-         <width>175</width>
-         <height>50</height>
-        </size>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>175</width>
-         <height>50</height>
-        </size>
-       </property>
-       <property name="font">
-        <font>
-         <family>MS Shell Dlg 2</family>
-         <pointsize>10</pointsize>
-         <kerning>true</kerning>
-        </font>
-       </property>
-       <property name="toolTip">
-        <string/>
-       </property>
-       <property name="styleSheet">
-        <string notr="true"/>
-       </property>
-       <property name="text">
-        <string>Обновить список</string>
        </property>
        <property name="default">
         <bool>false</bool>

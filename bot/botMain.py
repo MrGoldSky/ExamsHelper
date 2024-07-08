@@ -20,8 +20,10 @@ select = select()
 #TODO: Генератор вариантов
 #TODO: Добавить action окно в журнал с иформацией о программе
 #TODO: Сделать сортировку по классу/оценкам/дате
+#TODO: Добавить комментарии
+#TODO: Добавить возможность отключать время
 
-
+# Старт обработчик
 @bot.message_handler(commands=["start"])
 def start(message):
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
@@ -31,7 +33,7 @@ def start(message):
     markup.add(registration, information, bot_help)
     printy(message.chat.id, f"Привет {message.from_user.first_name}!", reply_markup=markup)
 
-
+# Вывод интерфейся
 def interface(message):
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
     rating = types.KeyboardButton("Просмотреть работы")
@@ -41,7 +43,8 @@ def interface(message):
     printy(message.chat.id, f"Возможности:", reply_markup=markup)
 
 
-def registration_student(message):
+# Регистрация пользователя
+def registrationStudent(message):
     def one(message):
         printy(message.chat.id, f"Введите Ваше имя (оно будет показываться учителю)")
         insert.insert_id(message.chat.id)
@@ -61,13 +64,14 @@ def registration_student(message):
     one(message)
 
 
-def view_questions(message):
-    def take_number(message):
+# Вывод списка вариантов
+def viewQuestions(message):
+    def takeNumber(message):
         if message.text == "Назад":
             return interface(message)
-        create_tasks(message, message.text)
+        createTasks(message, message.text)
 
-    list_return = ""
+    listReturn = ""
 
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
     back = types.KeyboardButton("Назад")
@@ -81,77 +85,106 @@ def view_questions(message):
             grade = select_grade(message.chat.id, i)
             percent = select_percent(message.chat.id, i)
             count = select_count(message.chat.id, i)
+            # Проверка, решал ли пользователь вариант. Вывод оценки и кол-ва решений
             if grade is None or count is None or count == 0:
-                list_return += f'№{i.replace(".txt", "").replace("B", "")} Работа не выполнена{chr(9200)} \n'
+                listReturn += f'№{i.replace(".txt", "").replace("B", "")} Работа не выполнена{chr(9200)} \n'
             else:
-                list_return += f'№{i.replace(".txt", "").replace("B", "")} {chr(9989)} {percent}% оценка {grade}. Кол-во решений: {count}\n'
-        except BaseException as e:
+                listReturn += f'№{i.replace(".txt", "").replace("B", "")} {chr(9989)} {percent}% оценка {grade}. Кол-во решений: {count}\n'
+        except BaseException as e: # Обработчик ошибки
             print(e)
-            print("Вообще хз, что не так тут (view_questions)")
-    printy(message.chat.id, list_return)
-    bot.register_next_step_handler(message, take_number)
+            print("Вообще хз, что не так тут (viewQuestions)")
+    printy(message.chat.id, listReturn)
+    bot.register_next_step_handler(message, takeNumber)
 
 
-def create_tasks(message, number):
+# Создания варианта для отправки пользователю
+def createTasks(message, number):
     answer = {}
     answers = {}
     tasks = []
     
-    def delete_image(chat_id, delete):
+    # Удаление отправленных сообщений
+    def deleteImage(chat_id, delete):
         for message_id in delete:
             bot.delete_message(chat_id=chat_id, message_id=message_id)
 
+    # Отправка карточки с заданием
     def view(message, task):
-        
-        #? Номер вопроса, имя файла карточки, время, правильный ответ, имя папки с карточками
-        photo = {'photo': open(f"{TASKS}{task[4]}\{task[1]}", 'rb')}
+        delete = []
+        taskFolder = f'{TASKS}{task[4]}'
+        mask = f'{task[4].replace("kge", "")}-{task[1].replace("(", " ").replace(")", " ").split()[1]}'
+
+        # Поиск файлов, соответствующих маске
+        matchingFiles = [f for f in os.listdir(taskFolder) if f.startswith(mask)]
+
+        # Отправка карточки
+        photo = {'photo': open(f"{taskFolder}\{task[1]}", 'rb')}
         text = f"Номер вопроса: {task[0]}. Вам даётся {task[2]} минуты."
         sent = bot.send_photo(message.chat.id, photo=photo['photo'], caption=text)
-        return sent.message_id
 
-    def wait_answer(message, q, delete):
+        # Отправка доп. файлов
+        for filename in matchingFiles:
+            filePath = f'{taskFolder}/{filename}'
+            with open(filePath, 'rb') as file:
+                doc = bot.send_document(message.chat.id, document=file)
+                delete.append(doc.message_id)
+
+        # Сохранение id сообщений для удаления 
+        delete.append(sent.message_id)
+        return delete
+    
+    def waitAnswer(message, q, delete):
         answers[q] = "+"
         answer[q] = message.text
-        delete_image(message.chat.id, delete)
+        deleteImage(message.chat.id, delete)
 
-    def view_tasks(message):
+    # Отправка карточек
+    def viewTasks(message):
         if message.text == "Назад":
             return interface(message)
+        
         delete = []
         stop = 0
         start = datetime.now()
+        
         for task in tasks:
             if stop == 1:
                 answer[int(task[0])] = None
                 continue
-            delete.append(view(message, task))
+            delete.extend(view(message, task))
             delete.append(printy(message.chat.id, "Введите ответ (число или пара чисел, записанных через пробел)").message_id)
             while answers[int(task[0])] == "-":
+                
+                #Проверка, что осталось время
                 if datetime.now() > dt_time_stop:
                     printy(message.chat.id, f"Время кончилось.")
                     stop = 1
                     answer[int(task[0])] = None
                     break
-                bot.register_next_step_handler(message, wait_answer, int(task[0]), delete)
+                bot.register_next_step_handler(message, waitAnswer, int(task[0]), delete)
                 delete = []
                 time.sleep(2)
 
+        # Сохранение результатов теста
         answer["name"] = name
         answer["surname"] = surname
-        answer["class"] = learning_class
+        answer["class"] = learningClass
         answer["question"] = question
         answer["time_solve"] = str(round((datetime.now() - start).total_seconds() / 60, 2)) + "min"
         answer["user_id"] = message.chat.id
-        answer["time_start"] = time_start
+        answer["time_start"] = timeStart
         answer['answers'] = answers
 
-        check_question(message, number, answer)
+        # Проверка ответов
+        checkQuestion(message, number, answer)
 
-    time_start = datetime.now().strftime('%d.%m.%Y %H:%M')
-    printy(message.chat.id, f'''Вы начинаете решение варианта {number} \nНачало решения: {time_start}''')
+    timeStart = datetime.now().strftime('%d.%m.%Y %H:%M')
+    printy(message.chat.id, f'''Вы начинаете решение варианта {number} \nНачало решения: {timeStart}''')
     name = select.select_name(message.chat.id)
     surname = select.select_surname(message.chat.id)
-    learning_class = select.select_class(message.chat.id)
+    learningClass = select.select_class(message.chat.id)
+    
+    # Открытие txt файла с вариантом
     try:
         question = f"exams/B{number}.txt"
         with open(question, "r") as file:
@@ -169,26 +202,29 @@ def create_tasks(message, number):
                 tasks.append(i.rstrip().split(";"))
     except BaseException as e:
         print(e)
-        print("Ошибка показа варианта.")
-        printy(message.chat.id, "Ошибка показа варианта.")
+        print("Ошибка открытия варианта.")
+        printy(message.chat.id, "Ошибка открытия варианта.")
     else:
-        t = threading.Thread(target=view_tasks, args=(message,))
+        # Старт потока решения для пользователя
+        t = threading.Thread(target=viewTasks, args=(message,))
         t.start()
 
-
-def check_question(message, number, answer):
+# Проверка работы
+def checkQuestion(message, number, answer):
     printy(message.chat.id, f"Вариант {number} отправлен на проверку. Результаты вы можете посмотреть во вкладке: Просмотреть работы")
     interface(message)
-    count_right = 0
+    countRight = 0 # Кол-во правильных решений
     with open(answer["question"], "r") as file:
         count = int(file.readline()[0])
         for i in file.readlines():
-            if i.rstrip().split(";")[3] == answer[int(i.rstrip().split(";")[0])]:
-                count_right += 1
+            if i.rstrip().split(";")[3] == answer[int(i.rstrip().split(";")[0])]: # Сверка ответов
+                countRight += 1
                 answer['answers'][int(i[0])] = chr(9989)
             else:
                 answer['answers'][int(i[0])] = chr(10060)
-        percent = round(count_right / count * 100, 2)
+        percent = round(countRight / count * 100, 2) # % выполнения работы
+        
+        # Выставление оценки
         if percent >= 85:
             grade = 5
         elif percent  >= 70:
@@ -206,16 +242,17 @@ def check_question(message, number, answer):
     printy(message.chat.id, f'''Вариант {number} Оценка {grade}
 {s}''')
 
+    # Сохранение результатов работы в БД
     name = answer["name"]
     surname = answer["surname"]
-    learning_class = answer["class"]
+    learningClass = answer["class"]
     user_id = answer["user_id"]
     question = answer["question"][6:]
-    time_start = answer["time_start"]
+    timeStart = answer["time_start"]
     time_solve = answer["time_solve"]
     answers = str(answer["answers"]).replace(f'{chr(9989)}', '+').replace(f'{chr(10060)}', '-')
 
-    insert_result(name, surname, learning_class, percent, grade, user_id, question, time_start, time_solve, answers)
+    insert_result(name, surname, learningClass, percent, grade, user_id, question, timeStart, time_solve, answers)
 
 #     go_txt(answer)
 
@@ -226,13 +263,14 @@ def check_question(message, number, answer):
 #     with open(file_name, "w") as file:
 #         pass
 
+# Обработчик кнопок
 @bot.message_handler(content_types=["text"])
 def check_text_message(message):
     if message.text == "Информация о боте":
         printy(message.chat.id, f"Бот создан специально для 44 Гимназии г.Пензы, для проверки знаний школьников")
         printy(message.chat.id, "Создатель бота: https://t.me/Mr_GoldSky")
     elif message.text == "Регистрация":
-        registration_student(message)
+        registrationStudent(message)
     elif message.text == "Возможности":
         interface(message)
     elif message.text == "Помощь в регистрации":
@@ -247,14 +285,9 @@ def check_text_message(message):
 Символом {chr(9200)} отмечены работы, ожидающие выполнения. \n
 После того, как вы сдадите работу, рядом будет стоять оценка''')
     elif message.text == "Просмотреть работы":
-        view_questions(message)
+        viewQuestions(message)
     elif message.text == "Назад":
         return interface(message)
-    elif message.text == "":
-        pass
-    elif message.text == "":
-        pass
-
 
 def startBot():
     bot.polling(none_stop=True)

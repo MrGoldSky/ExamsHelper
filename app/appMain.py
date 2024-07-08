@@ -13,7 +13,8 @@ from PyQt5.QtWidgets import QAbstractItemView, QPushButton, QVBoxLayout
 from PyQt5.QtCore import QModelIndex, Qt
 from PyQt5.QtGui import QPixmap
 
-class viewWxams(QWidget):
+
+class viewExams(QWidget):
     def __init__(self):
         super().__init__()
         uic.loadUi(viewExams_UI_PATH, self)
@@ -175,7 +176,7 @@ class MainWindow(QMainWindow):
                 event.accept()
 
     def openExamWindow(self):
-        self.examWindow = viewWxams()
+        self.examWindow = viewExams()
         self.examWindow.show()
 
 
