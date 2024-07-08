@@ -5,5 +5,6 @@ TASKS = "tasks/" #Путь к карточкам
 EXAMS = "exams/" #Путь к txt вариантам
 URL = 'https://api.telegram.org/bot' #Telegram url
 RESULT_PATH = "results/text/" #Путь к txt результатам
-UI_PATH = 'app/ui/untitled.ui'
+APP_UI_PATH = 'app/ui/app.ui'
 STYLE_PATH = "app/ui/styles/style.css"
+viewExams_UI_PATH = 'app/ui/viewExams.ui'

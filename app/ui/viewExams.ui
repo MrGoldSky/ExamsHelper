@@ -22,6 +22,9 @@
      <height>481</height>
     </rect>
    </property>
+   <property name="editTriggers">
+    <set>QAbstractItemView::NoEditTriggers</set>
+   </property>
    <attribute name="horizontalHeaderStretchLastSection">
     <bool>true</bool>
    </attribute>
@@ -219,7 +222,7 @@
        </property>
        <property name="text">
         <string>Создать случайный
-вариант (27 заданий)</string>
+вариант</string>
        </property>
       </widget>
      </item>
