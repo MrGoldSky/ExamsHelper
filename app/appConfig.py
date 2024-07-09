@@ -8,3 +8,4 @@ RESULT_PATH = "results/text/" #Путь к txt результатам
 APP_UI_PATH = 'app/ui/app.ui'
 STYLE_PATH = "app/ui/styles/style.css"
 viewExams_UI_PATH = 'app/ui/viewExams.ui'
+createExams_UI_PATH = 'app/ui/createExams.ui'

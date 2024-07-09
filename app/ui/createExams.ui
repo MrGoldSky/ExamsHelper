@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Просмотр вариантов</string>
+   <string>Генератор вариантов</string>
   </property>
   <widget class="QTableWidget" name="tableWidget">
    <property name="geometry">
@@ -30,7 +30,7 @@
    </attribute>
    <column>
     <property name="text">
-     <string>Вариант</string>
+     <string>Номер</string>
     </property>
    </column>
   </widget>
@@ -80,7 +80,7 @@
     </font>
    </property>
    <property name="text">
-    <string>Предпросмотр варианта</string>
+    <string>Предпросмотр номера</string>
    </property>
    <property name="alignment">
     <set>Qt::AlignCenter</set>
@@ -110,13 +110,13 @@
    </property>
    <property name="font">
     <font>
-     <pointsize>12</pointsize>
+     <pointsize>11</pointsize>
      <weight>75</weight>
      <bold>true</bold>
     </font>
    </property>
    <property name="text">
-    <string>Список вариантов</string>
+    <string>Список добавленных номеров</string>
    </property>
    <property name="alignment">
     <set>Qt::AlignCenter</set>
@@ -163,7 +163,7 @@
       <number>10</number>
      </property>
      <item row="0" column="1">
-      <widget class="QPushButton" name="changeSelected">
+      <widget class="QPushButton" name="remoteQuestionBtn">
        <property name="minimumSize">
         <size>
          <width>175</width>
@@ -190,8 +190,7 @@
         <string notr="true"/>
        </property>
        <property name="text">
-        <string>Изменить выбранный
-вариант</string>
+        <string>Удалить номер</string>
        </property>
        <property name="default">
         <bool>false</bool>
@@ -199,7 +198,7 @@
       </widget>
      </item>
      <item row="1" column="0">
-      <widget class="QPushButton" name="createRandom">
+      <widget class="QPushButton" name="createRandomBtn">
        <property name="minimumSize">
         <size>
          <width>175</width>
@@ -224,7 +223,7 @@
       </widget>
      </item>
      <item row="0" column="2">
-      <widget class="QCheckBox" name="checkBox">
+      <widget class="QCheckBox" name="timeAttached">
        <property name="minimumSize">
         <size>
          <width>0</width>
@@ -249,7 +248,7 @@
       </widget>
      </item>
      <item row="0" column="0">
-      <widget class="QPushButton" name="create">
+      <widget class="QPushButton" name="addQuestionBtn">
        <property name="minimumSize">
         <size>
          <width>175</width>
@@ -276,7 +275,7 @@
         <string notr="true"/>
        </property>
        <property name="text">
-        <string>Создать вариант</string>
+        <string>Добавить номер</string>
        </property>
        <property name="default">
         <bool>false</bool>
@@ -284,7 +283,7 @@
       </widget>
      </item>
      <item row="1" column="1">
-      <widget class="QPushButton" name="update">
+      <widget class="QPushButton" name="createExamBtn">
        <property name="minimumSize">
         <size>
          <width>175</width>
@@ -311,7 +310,7 @@
         <string notr="true"/>
        </property>
        <property name="text">
-        <string>Обновить список</string>
+        <string>Создать вариант ЕГЭ</string>
        </property>
        <property name="default">
         <bool>false</bool>
@@ -332,6 +331,49 @@
    </property>
    <property name="text">
     <string>--&gt;</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label">
+   <property name="geometry">
+    <rect>
+     <x>550</x>
+     <y>340</y>
+     <width>91</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>10</pointsize>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="text">
+    <string>Номер ЕГЭ</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="numberEdit">
+   <property name="geometry">
+    <rect>
+     <x>510</x>
+     <y>350</y>
+     <width>31</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>12</pointsize>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="text">
+    <string>1</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
    </property>
   </widget>
  </widget>

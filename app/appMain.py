@@ -1,6 +1,6 @@
 import sqlite3
 
-from app.appConfig import RESULT_BASE_PATH, APP_UI_PATH, STYLE_PATH, EXAMS, viewExams_UI_PATH
+from app.appConfig import RESULT_BASE_PATH, APP_UI_PATH, STYLE_PATH, EXAMS, viewExams_UI_PATH, createExams_UI_PATH
 from bot.botMain import stopBot, startBot
 
 import sys
@@ -26,11 +26,19 @@ class viewExams(QWidget):
         self.currentImageIndex = 0
         
         self.tableWidget.cellClicked.connect(self.cellWasClicked)
+        
         # Подключение кнопок
         self.update.clicked.connect(self.updateTable)
         self.right.clicked.connect(self.nextImage)
         self.left.clicked.connect(self.previousImage)
+        self.openCreatorBtn.clicked.connect(self.openCreator)
         self.updateTable()
+
+    def openCreator(self):
+        self.creatorWindow = createExams()
+        self.creatorWindow.show()
+        self.close()
+
 
     def updateTable(self): # Обновление данных таблицы
         files = os.listdir(EXAMS)
@@ -82,6 +90,69 @@ class viewExams(QWidget):
     def previousImage(self): # Отображение предыдущей картинки
         if self.currentImageIndex > 0:
             self.showImage(self.currentImageIndex - 1)
+
+
+class createExams(QWidget):
+    def __init__(self):
+        super().__init__()
+        uic.loadUi(createExams_UI_PATH, self)
+        self.setFixedSize(900, 540)
+        self.tableWidget.resizeColumnsToContents()
+        self.setStyleSheet(open(STYLE_PATH, "r").read())
+        
+        self.images = []
+        self.currentImageIndex = 0
+        
+        # self.tableWidget.cellClicked.connect(self.cellWasClicked)
+        
+        # Подключение кнопок
+        self.addQuestionBtn.clicked.connect(self.addQuesion)
+        self.remoteQuestionBtn.clicked.connect(self.remoteQuestion)
+        self.right.clicked.connect(self.nextImage)
+        self.left.clicked.connect(self.previousImage)
+        self.createRandomBtn.clicked.connect(self.createRandom)
+        self.createExamBtn.clicked.connect(self.createExam)
+        self.updateTable()
+
+    def updateTable(self): # Обновление данных таблицы
+        files = os.listdir(EXAMS)
+
+        self.tableWidget.setRowCount(0) # Отчистка таблицы
+        for i, file_name in enumerate(files):
+            self.tableWidget.setRowCount(self.tableWidget.rowCount() + 1)
+            self.tableWidget.setItem(i, 0, QTableWidgetItem(file_name))
+
+    def remoteQuestion(self):
+        ...
+        self.updateTable()
+
+    def addQuesion(self):
+        ...
+        self.updateTable()
+
+    def createRandom(self):
+        ...
+        self.updateTable()
+
+    def createExam(self):
+        ...
+        self.updateTable()
+
+    def showImage(self, index): # Отображение картинки с номером index
+        if 0 <= index < len(self.images):
+            pixmap = QPixmap(self.images[index])
+            self.preview.setPixmap(pixmap.scaled(self.preview.size(), aspectRatioMode=1))
+            self.currentImageIndex = index
+
+    def nextImage(self): # Отображение следующей картинки
+        if self.currentImageIndex < len(self.images) - 1:
+            self.showImage(self.currentImageIndex + 1)
+
+    def previousImage(self): # Отображение предыдущей картинки
+        if self.currentImageIndex > 0:
+            self.showImage(self.currentImageIndex - 1)
+
+
 
 class MainWindow(QMainWindow):
     def __init__(self):
