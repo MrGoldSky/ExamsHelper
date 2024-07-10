@@ -1,10 +1,11 @@
 import sqlite3
 
-from app.appConfig import RESULT_BASE_PATH, APP_UI_PATH, STYLE_PATH, EXAMS, viewExams_UI_PATH, createExams_UI_PATH
+from app.appConfig import RESULT_BASE_PATH, APP_UI_PATH, STYLE_PATH, EXAMS, TEMP, TASKS, viewExams_UI_PATH, createExams_UI_PATH
 from bot.botMain import stopBot, startBot
 
 import sys
 import os
+import shutil
 import threading
 
 from PyQt5 import uic
@@ -96,14 +97,17 @@ class createExams(QWidget):
     def __init__(self):
         super().__init__()
         uic.loadUi(createExams_UI_PATH, self)
-        self.setFixedSize(900, 540)
+        self.setFixedSize(1100, 675)
         self.tableWidget.resizeColumnsToContents()
         self.setStyleSheet(open(STYLE_PATH, "r").read())
         
         self.images = []
         self.currentImageIndex = 0
         
-        # self.tableWidget.cellClicked.connect(self.cellWasClicked)
+        self.selectedRow = None
+        self.selectedColumn = None
+        
+        self.tableWidget.cellClicked.connect(self.cellWasClicked)
         
         # Подключение кнопок
         self.addQuestionBtn.clicked.connect(self.addQuesion)
@@ -112,23 +116,40 @@ class createExams(QWidget):
         self.left.clicked.connect(self.previousImage)
         self.createRandomBtn.clicked.connect(self.createRandom)
         self.createExamBtn.clicked.connect(self.createExam)
+        self.clearTableBtn.clicked.connect(self.clearTemp)
+        self.downloadQuestions()
         self.updateTable()
 
     def updateTable(self): # Обновление данных таблицы
-        files = os.listdir(EXAMS)
-
+        files = os.listdir(TEMP)
+        
         self.tableWidget.setRowCount(0) # Отчистка таблицы
         for i, file_name in enumerate(files):
             self.tableWidget.setRowCount(self.tableWidget.rowCount() + 1)
             self.tableWidget.setItem(i, 0, QTableWidgetItem(file_name))
 
-    def remoteQuestion(self):
-        ...
+    def cellWasClicked(self, row, column): # Обработчик выбора ячейки
+        self.selectedRow = row
+        self.selectedColumn = column
+    
+    # Удаление выбранной карточки
+    def remoteQuestion(self): 
+        if self.selectedRow is not None and self.selectedColumn is not None: # Проверка, что удаляемая карточка выбрана
+            cellContent = self.tableWidget.item(self.selectedRow, self.selectedColumn).text()
+            os.remove(TEMP+f'/{cellContent}')
+            self.selectedRow = None
+            self.selectedColumn = None
         self.updateTable()
 
     def addQuesion(self):
-        ...
-        self.updateTable()
+        shutil.copy(f'{self.images[self.currentImageIndex]}', TEMP) # Копируем карточку в временное хранилище
+        self.updateTable() #Обновляем таблицу карточек
+        self.images = []
+        self.currentImageIndex = 0
+        
+        # Загружаем карточки следующего номера
+        self.numberEdit.setText(f'{int(self.numberEdit.text()) + 1}')
+        self.downloadQuestions() 
 
     def createRandom(self):
         ...
@@ -137,6 +158,23 @@ class createExams(QWidget):
     def createExam(self):
         ...
         self.updateTable()
+
+    def downloadQuestions(self):
+        try:
+            if int(self.numberEdit.text()) in range(1, 28):
+                questionNumber = self.numberEdit.text() 
+            else: return
+        except:
+            return
+        
+        for imageName in os.listdir(f'tasks/kge{questionNumber}'):
+            if '.png' in imageName:
+                imagePath = f'tasks/kge{questionNumber}/{imageName}'
+                self.images.append(imagePath)
+
+        # Отображение первого изображения
+        if self.images:
+            self.showImage(0)
 
     def showImage(self, index): # Отображение картинки с номером index
         if 0 <= index < len(self.images):
@@ -152,6 +190,17 @@ class createExams(QWidget):
         if self.currentImageIndex > 0:
             self.showImage(self.currentImageIndex - 1)
 
+    def clearTemp(self): # Отчистка папки temp
+        files = os.listdir(TEMP)
+        for i in files:
+            os.remove(f'{TEMP}/{i}')
+        self.numberEdit.setText('1') # Переключаем на карточку с 1 заданием
+        
+        # Обновляем таблицу и показ карточек
+        self.updateTable()
+        self.images = []
+        self.currentImageIndex = 0
+        self.downloadQuestions()
 
 
 class MainWindow(QMainWindow):
@@ -174,8 +223,8 @@ class MainWindow(QMainWindow):
         self.upload.clicked.connect(self.selectData)
         self.restart.clicked.connect(self.botRestart)
         self.stop.clicked.connect(self.botStop)
-        self.viewExams.clicked.connect(self.openExamWindow)
-        # self.createExams.clicked.connect(self.openExamWindow)
+        self.viewExams.clicked.connect(self.openViewExamWindow)
+        self.createExamsBtn.clicked.connect(self.openCreateExamsWindow)
         
         # Подключение чек боксов
         self.hideNoneCB.stateChanged.connect(self.hideNone)
@@ -185,6 +234,9 @@ class MainWindow(QMainWindow):
         self.tableWidget.setSelectionMode(QAbstractItemView.NoSelection)
         self.tableWidget.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.tableWidget.setCurrentIndex(QModelIndex())
+        
+        # CreateExams ещё не открыто
+        self.createExamsWindow = None
         
         self.selectData()
 
@@ -245,11 +297,17 @@ class MainWindow(QMainWindow):
                 self.con.close()
             elif msg.clickedButton() == buttonCancelar:
                 event.accept()
+        
+        
+        if self.createExamsWindow is not None: createExams.clearTemp(self.createExamsWindow)
 
-    def openExamWindow(self):
+    def openViewExamWindow(self):
         self.examWindow = viewExams()
         self.examWindow.show()
 
+    def openCreateExamsWindow(self):
+        self.createExamsWindow = createExams()
+        self.createExamsWindow.show()
 
 def openApp(): # Открытие журнала
     appConfig = QApplication(sys.argv)

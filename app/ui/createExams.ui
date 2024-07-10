@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>900</width>
-    <height>540</height>
+    <width>1100</width>
+    <height>675</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -39,8 +39,8 @@
     <rect>
      <x>260</x>
      <y>40</y>
-     <width>621</width>
-     <height>301</height>
+     <width>831</width>
+     <height>441</height>
     </rect>
    </property>
    <property name="frameShape">
@@ -54,8 +54,8 @@
      <rect>
       <x>10</x>
       <y>10</y>
-      <width>601</width>
-      <height>281</height>
+      <width>811</width>
+      <height>421</height>
      </rect>
     </property>
     <property name="text">
@@ -89,8 +89,8 @@
   <widget class="QToolButton" name="left">
    <property name="geometry">
     <rect>
-     <x>350</x>
-     <y>350</y>
+     <x>440</x>
+     <y>490</y>
      <width>111</width>
      <height>20</height>
     </rect>
@@ -126,7 +126,7 @@
    <property name="geometry">
     <rect>
      <x>260</x>
-     <y>380</y>
+     <y>520</y>
      <width>511</width>
      <height>141</height>
     </rect>
@@ -323,8 +323,8 @@
   <widget class="QToolButton" name="right">
    <property name="geometry">
     <rect>
-     <x>680</x>
-     <y>350</y>
+     <x>770</x>
+     <y>490</y>
      <width>111</width>
      <height>20</height>
     </rect>
@@ -336,8 +336,8 @@
   <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
-     <x>550</x>
-     <y>340</y>
+     <x>640</x>
+     <y>480</y>
      <width>91</width>
      <height>41</height>
     </rect>
@@ -356,9 +356,9 @@
   <widget class="QLineEdit" name="numberEdit">
    <property name="geometry">
     <rect>
-     <x>510</x>
-     <y>350</y>
-     <width>31</width>
+     <x>580</x>
+     <y>490</y>
+     <width>51</width>
      <height>20</height>
     </rect>
    </property>
@@ -374,6 +374,47 @@
    </property>
    <property name="alignment">
     <set>Qt::AlignCenter</set>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="clearTableBtn">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>530</y>
+     <width>220</width>
+     <height>50</height>
+    </rect>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>220</width>
+     <height>50</height>
+    </size>
+   </property>
+   <property name="maximumSize">
+    <size>
+     <width>220</width>
+     <height>50</height>
+    </size>
+   </property>
+   <property name="font">
+    <font>
+     <family>MS Shell Dlg 2</family>
+     <pointsize>10</pointsize>
+     <kerning>true</kerning>
+    </font>
+   </property>
+   <property name="toolTip">
+    <string/>
+   </property>
+   <property name="styleSheet">
+    <string notr="true"/>
+   </property>
+   <property name="text">
+    <string>Удалить все номера</string>
+   </property>
+   <property name="default">
+    <bool>false</bool>
    </property>
   </widget>
  </widget>

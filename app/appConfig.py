@@ -7,5 +7,6 @@ URL = 'https://api.telegram.org/bot' #Telegram url
 RESULT_PATH = "results/text/" #Путь к txt результатам
 APP_UI_PATH = 'app/ui/app.ui'
 STYLE_PATH = "app/ui/styles/style.css"
+TEMP = 'app/temp'
 viewExams_UI_PATH = 'app/ui/viewExams.ui'
 createExams_UI_PATH = 'app/ui/createExams.ui'
