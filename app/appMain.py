@@ -1,4 +1,5 @@
-from app.appConfig import RESULT_BASE_PATH, APP_UI_PATH, STYLE_PATH, EXAMS, TEMP, TASKS, QUEST_TIME, viewExams_UI_PATH, createExams_UI_PATH
+from app.appConfig import RESULT_BASE_PATH, APP_UI_PATH, STYLE_PATH, EXAMS, TEMP, TASKS, QUEST_TIME
+from app.appConfig import aboutWindow_UI_PATH, viewExams_UI_PATH, createExams_UI_PATH
 from parser.parser import getAnswer
 from bot.botMain import stopBot, startBot
 
@@ -6,6 +7,7 @@ import sys
 import os
 import shutil
 import threading
+from datetime import date
 from random import choice
 
 from PyQt5 import uic
@@ -316,6 +318,14 @@ class createExams(QWidget):
         self.downloadQuestions()
 
 
+class AboutWindow(QWidget): # Окно информации о программе
+    def __init__(self):
+        super().__init__()
+        uic.loadUi(aboutWindow_UI_PATH, self)
+        self.setFixedSize(428, 235)
+        self.setStyleSheet(open(STYLE_PATH, "r").read())
+
+
 class MainWindow(QMainWindow):
     def __init__(self):
         # Подключение UI
@@ -331,6 +341,7 @@ class MainWindow(QMainWindow):
         # Начальные значения
         self.bot_thread = None
         self.hn = False
+        self.std = False
         
         # Подключение кнопок
         self.upload.clicked.connect(self.selectData)
@@ -338,9 +349,11 @@ class MainWindow(QMainWindow):
         self.stop.clicked.connect(self.botStop)
         self.viewExams.clicked.connect(self.openViewExamWindow)
         self.createExamsBtn.clicked.connect(self.openCreateExamsWindow)
+        self.openAboutBtn.clicked.connect(self.openAboutWindow)
         
         # Подключение чек боксов
         self.hideNoneCB.stateChanged.connect(self.hideNone)
+        self.showTodaysCB.stateChanged.connect(self.showTodays)
         
         # Настройки виджета таблицы
         self.tableWidget.resizeColumnsToContents()
@@ -365,6 +378,9 @@ class MainWindow(QMainWindow):
         
         if self.hn: # Если выбран режим без None
             data = [i for i in self.res if None not in i]
+        
+        if self.std: # Если выбран режим покзывать только сегодняшние решения
+            data = [i for i in self.res if i[8] is not None and date.today().strftime('%d.%m.%Y') in i[8]]
         
         for i, row in enumerate(data): # Ввод данных в таблицу
             self.tableWidget.insertRow(i)
@@ -391,6 +407,10 @@ class MainWindow(QMainWindow):
     def hideNone(self, state):
         self.hn = (state == Qt.Checked)
         self.view()
+    
+    def showTodays(self, state):
+        self.std = (state == Qt.Checked)
+        self.view()
 
     def closeEvent(self, event): # Обработка закрытия журнала
         # Вывод диалогового окна, если бот запущен во время закрытия
@@ -408,6 +428,7 @@ class MainWindow(QMainWindow):
                 stopBot()
                 self.bot_thread.join()  # Ожидаем завершения потока
                 self.con.close()
+                exit(0)
             elif msg.clickedButton() == buttonCancelar:
                 event.accept()
         
@@ -421,6 +442,10 @@ class MainWindow(QMainWindow):
         self.createExamsWindow = createExams()
         self.createExamsWindow.show()
 
+    def openAboutWindow(self):
+        self.aboutWindow = AboutWindow()
+        self.aboutWindow.show()
+
 # Парсим номер ЕГЭ и номер в сборнике Полякова
 def parseQuestion(question:str) -> tuple:
     egeNo = question.split('(')[0].replace('kge', '')
@@ -433,3 +458,4 @@ def openApp(): # Открытие журнала
     ex = MainWindow()
     ex.show()
     sys.exit(appConfig.exec_())
+    

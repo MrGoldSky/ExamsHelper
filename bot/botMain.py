@@ -261,8 +261,8 @@ def checkQuestion(message, number, answer):
 @bot.message_handler(content_types=["text"])
 def check_text_message(message):
     if message.text == "Информация о боте":
-        printy(message.chat.id, f"Бот создан специально для 44 Гимназии г.Пензы, для проверки знаний школьников")
-        printy(message.chat.id, "Создатель бота: https://t.me/Mr_GoldSky")
+        printy(message.chat.id, f"Бот создан с помощью библиотек pyTelegramBotAPI, SQLite3, PyQt5, threading, для проверки знаний школьников")
+        printy(message.chat.id, "Создатель бота: https://t.me/Mr_GoldSky\nЗадания взяты с сайта К.Ю. Полякова: https://kpolyakov.spb.ru/")
     elif message.text == "Регистрация":
         registrationStudent(message)
     elif message.text == "Возможности":
