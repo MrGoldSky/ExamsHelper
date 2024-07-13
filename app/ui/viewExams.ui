@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>900</width>
-    <height>540</height>
+    <width>1100</width>
+    <height>675</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -42,8 +42,8 @@
     <rect>
      <x>260</x>
      <y>40</y>
-     <width>621</width>
-     <height>301</height>
+     <width>831</width>
+     <height>441</height>
     </rect>
    </property>
    <property name="frameShape">
@@ -57,8 +57,8 @@
      <rect>
       <x>10</x>
       <y>10</y>
-      <width>601</width>
-      <height>281</height>
+      <width>811</width>
+      <height>421</height>
      </rect>
     </property>
     <property name="text">
@@ -92,8 +92,8 @@
   <widget class="QToolButton" name="left">
    <property name="geometry">
     <rect>
-     <x>350</x>
-     <y>350</y>
+     <x>460</x>
+     <y>490</y>
      <width>111</width>
      <height>20</height>
     </rect>
@@ -128,8 +128,8 @@
   <widget class="QFrame" name="backgroundFrame2">
    <property name="geometry">
     <rect>
-     <x>260</x>
-     <y>380</y>
+     <x>430</x>
+     <y>520</y>
      <width>511</width>
      <height>141</height>
     </rect>
@@ -302,8 +302,8 @@
   <widget class="QToolButton" name="right">
    <property name="geometry">
     <rect>
-     <x>680</x>
-     <y>350</y>
+     <x>790</x>
+     <y>490</y>
      <width>111</width>
      <height>20</height>
     </rect>

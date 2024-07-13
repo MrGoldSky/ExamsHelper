@@ -1,0 +1,8 @@
+7,0
+1;kge1(40).png;3;16;kge1
+2;kge2(1).png;3;1;kge2
+3;kge3(1).png;3;11724;kge3
+4;kge4(115).png;2;110;kge4
+5;kge5(101).png;4;17;kge5
+6;kge6(20).png;4;24;kge6
+7;kge7(103).png;5;4;kge7

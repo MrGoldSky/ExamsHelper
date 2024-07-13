@@ -17,12 +17,6 @@ printy = bot.send_message
 insert = insert()
 select = select()
 
-#TODO: Генератор вариантов
-#TODO: Добавить action окно в журнал с иформацией о программе
-#TODO: Сделать сортировку по классу/оценкам/дате
-#TODO: Добавить комментарии
-#TODO: Добавить возможность отключать время
-
 # Старт обработчик
 @bot.message_handler(commands=["start"])
 def start(message):
@@ -77,7 +71,7 @@ def viewQuestions(message):
     back = types.KeyboardButton("Назад")
     markup.add(back)
 
-    printy(message.chat.id, 'Напишите номер варианта, который хотите решить. Или нажмите кнопку "Назад", чтобы вернуться назад', reply_markup=markup)
+    printy(message.chat.id, 'Напишите название варианта, который хотите решить. Или нажмите кнопку "Назад", чтобы вернуться назад', reply_markup=markup)
     printy(message.chat.id, "Список доступных вариантов:")
 
     for i in os.listdir(EXAMS):
@@ -87,9 +81,9 @@ def viewQuestions(message):
             count = select_count(message.chat.id, i)
             # Проверка, решал ли пользователь вариант. Вывод оценки и кол-ва решений
             if grade is None or count is None or count == 0:
-                listReturn += f'№{i.replace(".txt", "").replace("B", "")} Работа не выполнена{chr(9200)} \n'
+                listReturn += f'№ {i.replace(".txt", "")} Работа не выполнена{chr(9200)} \n'
             else:
-                listReturn += f'№{i.replace(".txt", "").replace("B", "")} {chr(9989)} {percent}% оценка {grade}. Кол-во решений: {count}\n'
+                listReturn += f'№ {i.replace(".txt", "")} {chr(9989)} {percent}% оценка {grade}. Кол-во решений: {count}\n'
         except BaseException as e: # Обработчик ошибки
             print(e)
             print("Вообще хз, что не так тут (viewQuestions)")
@@ -115,7 +109,7 @@ def createTasks(message, number):
         mask = f'{task[4].replace("kge", "")}-{task[1].replace("(", " ").replace(")", " ").split()[1]}'
 
         # Поиск файлов, соответствующих маске
-        matchingFiles = [f for f in os.listdir(taskFolder) if f.startswith(mask)]
+        matchingFiles = [f for f in os.listdir(taskFolder) if f.startswith(mask + '.')]
 
         # Отправка карточки
         photo = {'photo': open(f"{taskFolder}\{task[1]}", 'rb')}
@@ -186,7 +180,7 @@ def createTasks(message, number):
     
     # Открытие txt файла с вариантом
     try:
-        question = f"exams/B{number}.txt"
+        question = f"exams/{number}.txt"
         with open(question, "r") as file:
             time_ = 0
             file.readline()
@@ -215,7 +209,7 @@ def checkQuestion(message, number, answer):
     interface(message)
     countRight = 0 # Кол-во правильных решений
     with open(answer["question"], "r") as file:
-        count = int(file.readline()[0])
+        count = int(file.readline().split(',')[0])
         for i in file.readlines():
             if i.rstrip().split(";")[3] == answer[int(i.rstrip().split(";")[0])]: # Сверка ответов
                 countRight += 1

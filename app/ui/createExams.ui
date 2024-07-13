@@ -22,6 +22,9 @@
      <height>481</height>
     </rect>
    </property>
+   <property name="editTriggers">
+    <set>QAbstractItemView::NoEditTriggers</set>
+   </property>
    <attribute name="horizontalHeaderStretchLastSection">
     <bool>true</bool>
    </attribute>
@@ -339,7 +342,7 @@
   <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
-     <x>640</x>
+     <x>660</x>
      <y>480</y>
      <width>91</width>
      <height>41</height>
@@ -359,7 +362,7 @@
   <widget class="QLineEdit" name="numberEdit">
    <property name="geometry">
     <rect>
-     <x>580</x>
+     <x>600</x>
      <y>490</y>
      <width>55</width>
      <height>20</height>
@@ -377,6 +380,9 @@
    </property>
    <property name="alignment">
     <set>Qt::AlignCenter</set>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
    </property>
   </widget>
   <widget class="QPushButton" name="clearTableBtn">
@@ -458,6 +464,32 @@
    </property>
    <property name="placeholderText">
     <string>Введите название экзамена</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="nextTopicBtn">
+   <property name="geometry">
+    <rect>
+     <x>800</x>
+     <y>560</y>
+     <width>131</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Следующий номер ЕГЭ</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="previousTopicBtn">
+   <property name="geometry">
+    <rect>
+     <x>940</x>
+     <y>560</y>
+     <width>131</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Предыдущий номер ЕГЭ</string>
    </property>
   </widget>
  </widget>

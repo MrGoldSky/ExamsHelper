@@ -10,7 +10,7 @@ from random import choice
 
 from PyQt5 import uic
 from PyQt5.QtWidgets import QApplication, QMainWindow, QTableWidgetItem, QMessageBox, QWidget
-from PyQt5.QtWidgets import QAbstractItemView, QPushButton, QVBoxLayout
+from PyQt5.QtWidgets import QAbstractItemView, QPushButton, QVBoxLayout, QLabel, QHBoxLayout
 from PyQt5.QtCore import QModelIndex, Qt
 from PyQt5.QtGui import QPixmap
 
@@ -21,12 +21,13 @@ class viewExams(QWidget):
     def __init__(self):
         super().__init__()
         uic.loadUi(viewExams_UI_PATH, self)
-        self.setFixedSize(900, 540)
+        self.setFixedSize(1100, 675)
         self.tableWidget.resizeColumnsToContents()
         self.setStyleSheet(open(STYLE_PATH, "r").read())
         
         self.images = []
         self.currentImageIndex = 0
+        self.preview.setAlignment(Qt.AlignCenter)
         
         self.creatorWindow = createExams() # Запуск генаратора вариантов
         
@@ -38,8 +39,13 @@ class viewExams(QWidget):
         self.left.clicked.connect(self.previousImage)
         self.openCreatorBtn.clicked.connect(self.openCreator)
         self.deleteSelectedBtn.clicked.connect(self.deleteSelected)
-        self.createRandom.clicked.connect(self.creatorWindow.createRandom)
+        self.createRandom.clicked.connect(self.creaternd)
         
+        self.updateTable()
+
+    def creaternd(self):
+        self.creatorWindow.createRandom()
+        self.creatorWindow.saveExam()
         self.updateTable()
 
     def openCreator(self):
@@ -66,13 +72,13 @@ class viewExams(QWidget):
         lines = f.readlines()
         self.procesExamFile(lines, settings)
 
-    def procesExamFile(self, lines:str, settings:str):
+    def procesExamFile(self, lines:list, settings:str):
         self.images = []
         self.currentImageIndex = 0
 
         # Обработка первой строки
         # settings = lines[0].split(',')
-        settingsInfo = f"Кол. вопросов: {settings[0]}, Вкл. время теста: {settings[1]}, Отк. кн. назад: {settings[2]}, Вкл. кн. помощь: {settings[3]}, Вкл. право на ошибку: {settings[4]}, Вкл. генератор варианта: {settings[5].strip()}"
+        # settingsInfo = f"Кол. вопросов: {settings[0]}, Вкл. время теста: {settings[1]}, Отк. кн. назад: {settings[2]}, Вкл. кн. помощь: {settings[3]}, Вкл. право на ошибку: {settings[4]}, Вкл. генератор варианта: {settings[5].strip()}"
         # QMessageBox.information(self, "Настройки теста", settingsInfo)
 
         # Cохранение путей к картинкам заданий
@@ -115,11 +121,13 @@ class createExams(QWidget):
         
         self.images = []
         self.currentImageIndex = 0
+        self.preview.setAlignment(Qt.AlignCenter)
         
         self.selectedRow = None
         self.selectedColumn = None
         
         self.tableWidget.cellClicked.connect(self.cellWasClicked)
+        self.tableWidget.cellDoubleClicked.connect(self.cellWasDoubleClicked)
         
         # Подключение кнопок
         self.addQuestionBtn.clicked.connect(self.addQuesion)
@@ -129,11 +137,13 @@ class createExams(QWidget):
         self.createRandomBtn.clicked.connect(self.createRandom)
         self.clearTableBtn.clicked.connect(self.clearTemp)
         self.saveExamBtn.clicked.connect(self.saveExam)
+        self.nextTopicBtn.clicked.connect(self.nextTopic)
+        self.previousTopicBtn.clicked.connect(self.previousTopic)
         
         self.downloadQuestions()
         self.updateTable()
 
-    def saveExam(self):
+    def saveExam(self): # Сохранение созданного варианта
         files = os.listdir(TEMP)       
         count = len(files)
         time = 1 if self.timeAttached.isChecked() else 0
@@ -141,12 +151,13 @@ class createExams(QWidget):
             f = open(f'{EXAMS}/{self.examName.text()}.txt', 'w')
         else:
             f = open(f'{EXAMS}/В{len(os.listdir(EXAMS))}.txt', 'w')
-        f.write(f'{count},{time}\n')
         
+        # Запись в файл варианта
+        f.write(f'{count},{time}\n')
         for n, question in enumerate(files):
             egeNo, topicNo = parseQuestion(question)
             
-            answer = getAnswer(egeNo, topicNo).rstrip()
+            answer = ' '.join(getAnswer(egeNo, topicNo).rstrip().replace('<br/>', ' ').split())
             
             f.write(f'{n + 1};{question};{QUEST_TIME[int(egeNo)]};{answer};kge{egeNo}\n')
         
@@ -157,6 +168,9 @@ class createExams(QWidget):
     def updateTable(self): # Обновление данных таблицы
         files = os.listdir(TEMP)
         
+        # Сортировка карточек
+        files = sorted(files, key=lambda x: (parseQuestion(x)[0], parseQuestion(x)[1]))
+        
         self.tableWidget.setRowCount(0) # Отчистка таблицы
         for i, file_name in enumerate(files):
             self.tableWidget.setRowCount(self.tableWidget.rowCount() + 1)
@@ -165,7 +179,45 @@ class createExams(QWidget):
     def cellWasClicked(self, row:int, column:int): # Обработчик выбора ячейки
         self.selectedRow = row
         self.selectedColumn = column
-    
+
+    def cellWasDoubleClicked(self, row, column):
+        item = self.tableWidget.item(row, column)
+        self.selectedColumn = column
+        self.selectedRow = row
+        
+        parsedItem = parseQuestion(item.text())
+        path = f'{TASKS}/kge{parsedItem[0]}/{item.text()}'
+        
+        # Создаем виджет для отображения изображения и кнопок
+        self.previewWidget = QWidget()
+        self.previewWidget.setStyleSheet(open(STYLE_PATH, "r").read())
+        self.previewWidget.setWindowTitle(f"Предпросмотр задания {item.text()}")
+        self.previewWidget.setFixedSize(900, 500)
+        
+        # настройка qlabel и qpixmap
+        label = QLabel(self.previewWidget)
+        label.setAlignment(Qt.AlignCenter)
+        pixmap = QPixmap(path)
+        label.setPixmap(pixmap.scaled(811, 421, Qt.KeepAspectRatio))
+        
+        # Настройка кнопок нопки
+        buttonDelete = QPushButton('Удалить', self.previewWidget)
+        buttonCancel = QPushButton('Закрыть', self.previewWidget)
+        buttonCancel.clicked.connect(self.previewWidget.close)
+        buttonDelete.clicked.connect(self.remoteQuestion)
+        buttonDelete.setFixedSize(175, 50)
+        buttonCancel.setFixedSize(175, 50)
+        
+        buttonLayout = QHBoxLayout()
+        buttonLayout.addWidget(buttonCancel)
+        buttonLayout.addWidget(buttonDelete)
+        layout = QVBoxLayout()
+        layout.addWidget(label)
+        layout.addLayout(buttonLayout)
+        self.previewWidget.setLayout(layout)
+        
+        self.previewWidget.show()
+
     # Удаление выбранной карточки
     def remoteQuestion(self): 
         if self.selectedRow is not None and self.selectedColumn is not None: # Проверка, что удаляемая карточка выбрана
@@ -175,18 +227,30 @@ class createExams(QWidget):
             self.selectedColumn = None
         self.updateTable()
 
+# Загружаем карточки следующего номера
+    def nextTopic(self):
+        if self.numberEdit.text() != '27': self.numberEdit.setText(f'{int(self.numberEdit.text()) + 1}')
+        
+        # Обновляем карточки
+        self.images = []
+        self.currentImageIndex = 0
+        self.downloadQuestions()
+
+# Загружаем карточки предыдущего номера
+    def previousTopic(self):
+        if self.numberEdit.text() != '1': self.numberEdit.setText(f'{int(self.numberEdit.text()) - 1}')
+        
+        # Обновляем карточки
+        self.images = []
+        self.currentImageIndex = 0
+        self.downloadQuestions()
+
     def addQuesion(self):
         if self.numberEdit.text() == '28': # Проверка, что номера остались
             return
         
         shutil.copy(f'{self.images[self.currentImageIndex]}', TEMP) # Копируем карточку в временное хранилище
         self.updateTable() #Обновляем таблицу карточек
-        self.images = []
-        self.currentImageIndex = 0
-    
-        # Загружаем карточки следующего номера
-        if self.numberEdit.text() != '27': self.numberEdit.setText(f'{int(self.numberEdit.text()) + 1}')
-        self.downloadQuestions()
 
     def createRandom(self): # Создание случайного варианта
         self.clearTemp() # Удаляем старые задания
@@ -361,7 +425,7 @@ class MainWindow(QMainWindow):
 def parseQuestion(question:str) -> tuple:
     egeNo = question.split('(')[0].replace('kge', '')
     topicNo = question.split('(')[1][:question.split('(')[1].index(')')]
-    return egeNo, topicNo
+    return int(egeNo), int(topicNo)
 
 
 def openApp(): # Открытие журнала
