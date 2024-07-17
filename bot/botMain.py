@@ -3,7 +3,6 @@ import threading
 import time
 from datetime import datetime, timedelta
 
-import requests
 import telebot
 from telebot import types
 
@@ -150,7 +149,7 @@ def createTasks(message, number):
             while answers[int(task[0])] == "-":
                 
                 #Проверка, что осталось время
-                if datetime.now() > dt_time_stop:
+                if int(settings[1]) and datetime.now() > dt_time_stop:
                     printy(message.chat.id, f"Время кончилось.")
                     stop = 1
                     answer[int(task[0])] = None
@@ -183,7 +182,7 @@ def createTasks(message, number):
         question = f"exams/{number}.txt"
         with open(question, "r") as file:
             time_ = 0
-            file.readline()
+            settings = file.readline().split(',')
             # print(file.readline().split("'")[0])
             for i in file.readlines():
                 time_ += int(i.rstrip().split(";")[2])
