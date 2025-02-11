@@ -175,8 +175,6 @@ class createExams(QWidget):
         
         self.tableWidget.setRowCount(0) # Отчистка таблицы
         for i, file_name in enumerate(files):
-            if file_name == ".gitkeep":
-                continue
             self.tableWidget.setRowCount(self.tableWidget.rowCount() + 1)
             self.tableWidget.setItem(i, 0, QTableWidgetItem(file_name))
 
